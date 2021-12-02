@@ -268,6 +268,10 @@ public abstract class JCTree implements Tree, Cloneable, DiagnosticPosition {
          */
         TYPEIDENT,
 
+	/** Condition types, pf type TypeCondition.
+	 */
+	TYPECONDITION,
+
         /** Array types, of type TypeArray.
          */
         TYPEARRAY,
@@ -2678,6 +2682,34 @@ public abstract class JCTree implements Tree, Cloneable, DiagnosticPosition {
     }
 
     /**
+     * Identifies a condition type
+     */
+    public static class JCConditionTypeTree extends JCExpression implements ConditionTypeTree {
+//
+	protected JCConditionTypeTree() {
+//
+	}
+	@Override
+	public void accept(Visitor v) { v.visitTypeCondition(this); }
+
+	@DefinedBy(Api.COMPILER_TREE)
+	public Kind getKind() { return Kind.CONDITION_TYPE; }
+//	@DefinedBy(Api.COMPITER_TREE)
+//	public a function here
+//		return something;
+//	}
+
+	@Override @DefinedBy(Api.COMPILER_TREE)
+	public <R,D> R accept(TreeVisitor<R,D> v, D d) {
+	    return v.visitConditionType(this, d);
+	}
+	@Override
+	public Tag getTag() {
+	    return TYPECONDITION;
+	}
+    }
+
+    /**
      * An array type, A[]
      */
     public static class JCArrayTypeTree extends JCExpression implements ArrayTypeTree {
@@ -3382,6 +3414,7 @@ public abstract class JCTree implements Tree, Cloneable, DiagnosticPosition {
         JCIdent Ident(Name idname);
         JCLiteral Literal(TypeTag tag, Object value);
         JCPrimitiveTypeTree TypeIdent(TypeTag typetag);
+	JCConditionTypeTree TypeCondition();
         JCArrayTypeTree TypeArray(JCExpression elemtype);
         JCTypeApply TypeApply(JCExpression clazz, List<JCExpression> arguments);
         JCTypeParameter TypeParameter(Name name, List<JCExpression> bounds);
@@ -3451,6 +3484,7 @@ public abstract class JCTree implements Tree, Cloneable, DiagnosticPosition {
         public void visitIdent(JCIdent that)                 { visitTree(that); }
         public void visitLiteral(JCLiteral that)             { visitTree(that); }
         public void visitTypeIdent(JCPrimitiveTypeTree that) { visitTree(that); }
+	public void visitTypeCondition(JCConditionTypeTree that) { visitTree(that); }
         public void visitTypeArray(JCArrayTypeTree that)     { visitTree(that); }
         public void visitTypeApply(JCTypeApply that)         { visitTree(that); }
         public void visitTypeUnion(JCTypeUnion that)         { visitTree(that); }

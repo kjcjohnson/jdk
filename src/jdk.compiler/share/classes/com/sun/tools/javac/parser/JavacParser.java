@@ -1438,6 +1438,10 @@ public class JavacParser implements Parser {
             if (typeArgs != null) illegal();
             t = bracketsSuffix(bracketsOpt(basicType()));
             break;
+	case CONDITION:
+	     if (typeArgs != null) illegal();
+	     t = conditionType();
+	     break;
         case VOID:
             if (typeArgs != null) illegal();
             if ((mode & EXPR) != 0) {
@@ -2009,6 +2013,15 @@ public class JavacParser implements Parser {
         JCPrimitiveTypeTree t = to(F.at(token.pos).TypeIdent(typetag(token.kind)));
         nextToken();
         return t;
+    }
+
+    /** Condition = CONDITION
+     */
+    JCConditionTypeTree conditionType() {
+	System.out.println("Condition type declared");
+	JCConditionTypeTree t = to(F.at(token.pos).TypeCondition());
+	nextToken();
+	return t;
     }
 
     /** ArgumentsOpt = [ Arguments ]

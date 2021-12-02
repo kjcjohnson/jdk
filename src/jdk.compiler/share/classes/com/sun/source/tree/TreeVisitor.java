@@ -469,6 +469,14 @@ public interface TreeVisitor<R,P> {
     R visitArrayType(ArrayTypeTree node, P p);
 
     /**
+     * Visits a ConditionTypeTree node.
+     * @param node the node being visited
+     * @param p a parameter value
+     * @return a result value
+     */
+    R visitConditionType(ConditionTypeTree node, P p);
+
+    /**
      * Visits a TypeCastTree node.
      * @param node the node being visited
      * @param p a parameter value

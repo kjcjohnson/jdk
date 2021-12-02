@@ -776,6 +776,14 @@ public class SimpleTreeVisitor <R,P> implements TreeVisitor<R,P> {
     }
 
     /**
+     * [TODO] copy comment from visitPrimitiveType
+     */
+    @Override
+    public R visitConditionType(ConditionTypeTree node, P p) {
+	return defaultAction(node, p);
+    }
+
+    /**
      * {@inheritDoc}
      *
      * @implSpec This implementation calls {@code defaultAction}.
