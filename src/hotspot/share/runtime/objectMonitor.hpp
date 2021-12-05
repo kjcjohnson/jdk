@@ -32,6 +32,7 @@
 #include "runtime/os.hpp"
 #include "runtime/park.hpp"
 #include "runtime/perfDataTypes.hpp"
+#include <vector>
 
 class ObjectMonitor;
 
@@ -46,8 +47,11 @@ class ObjectWaiter : public StackObj {
   enum TStates { TS_UNDEF, TS_READY, TS_RUN, TS_WAIT, TS_ENTER, TS_CXQ };
   ObjectWaiter* volatile _next;
   ObjectWaiter* volatile _prev;
+  ObjectWaiter* volatile _nextWaitset;
+  ObjectWaiter* volatile _prevWaitset;
+  oop* _object;
   JavaThread*   _thread;
-  jlong         _notifier_tid;
+  uint64_t      _notifier_tid;
   ParkEvent *   _event;
   volatile int  _notified;
   volatile TStates TState;
@@ -148,13 +152,13 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
   // Used by async deflation as a marker in the _owner field:
   #define DEFLATER_MARKER reinterpret_cast<void*>(-1)
   void* volatile _owner;            // pointer to owning thread OR BasicLock
-  volatile jlong _previous_owner_tid;  // thread id of the previous owner of the monitor
+  volatile uint64_t _previous_owner_tid;  // thread id of the previous owner of the monitor
   // Separate _owner and _next_om on different cache lines since
   // both can have busy multi-threaded access. _previous_owner_tid is only
   // changed by ObjectMonitor::exit() so it is a good choice to share the
   // cache line with _owner.
   DEFINE_PAD_MINUS_SIZE(1, OM_CACHE_LINE_SIZE, sizeof(void* volatile) +
-                        sizeof(volatile jlong));
+                        sizeof(volatile uint64_t));
   ObjectMonitor* _next_om;          // Next ObjectMonitor* linkage
   volatile intx _recursions;        // recursion count, 0 for first entry
   ObjectWaiter* volatile _EntryList;  // Threads blocked on entry or reentry.
@@ -168,13 +172,16 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
   volatile int _Spinner;            // for exit->spinner handoff optimization
   volatile int _SpinDuration;
 
-  jint  _contentions;               // Number of active contentions in enter(). It is used by is_busy()
+  int _contentions;                 // Number of active contentions in enter(). It is used by is_busy()
                                     // along with other fields to determine if an ObjectMonitor can be
                                     // deflated. It is also used by the async deflation protocol. See
                                     // ObjectMonitor::deflate_monitor().
+                                                         
+                                 
  protected:
   ObjectWaiter* volatile _WaitSet;  // LL of threads wait()ing on the monitor
-  volatile jint  _waiters;          // number of waiting threads
+  ObjectWaiter* volatile _WaitSetCV;
+  volatile int  _waiters;           // number of waiting threads
  private:
   volatile int _WaitSetLock;        // protects Wait Queue - simple spinlock
 
@@ -238,9 +245,10 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
 
   bool is_busy() const {
     // TODO-FIXME: assert _owner == null implies _recursions = 0
-    intptr_t ret_code = _waiters | intptr_t(_cxq) | intptr_t(_EntryList);
-    if (contentions() > 0) {
-      ret_code |= contentions();
+    intptr_t ret_code = intptr_t(_waiters) | intptr_t(_cxq) | intptr_t(_EntryList);
+    int cnts = contentions(); // read once
+    if (cnts > 0) {
+      ret_code |= intptr_t(cnts);
     }
     if (!owner_is_DEFLATER_MARKER()) {
       ret_code |= intptr_t(owner_raw());
@@ -281,14 +289,29 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
   // _next_om field. Returns the prior value of the _next_om field.
   ObjectMonitor* try_set_next_om(ObjectMonitor* old_value, ObjectMonitor* new_value);
 
-  jint      waiters() const;
+  int       waiters() const;
 
-  jint      contentions() const;
-  void      add_to_contentions(jint value);
+  int       contentions() const;
+  void      add_to_contentions(int value);
   intx      recursions() const                                         { return _recursions; }
 
   // JVM/TI GetObjectMonitorUsage() needs this:
-  ObjectWaiter* first_waiter()                                         { return _WaitSet; }
+  ObjectWaiter* first_waiter(oop* object = NULL) {
+  	if (object == NULL)
+  	  return _WaitSet;
+  	  
+  	if (_WaitSet->_object == object)
+  		return _WaitSet;
+  		
+    ObjectWaiter* temp = _WaitSetCV;
+    while (temp != NULL) {
+      if (temp->_object == object)
+        return temp;
+      temp = temp->_nextWaitset;
+    }
+    
+    return NULL; 
+  }
   ObjectWaiter* next_waiter(ObjectWaiter* o)                           { return o->_next; }
   JavaThread* thread_of_waiter(ObjectWaiter* o)                        { return o->_thread; }
 
@@ -322,7 +345,7 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
  public:
   bool      enter(JavaThread* current);
   void      exit(JavaThread* current, bool not_suspended = true);
-  void      wait(jlong millis, bool interruptible, TRAPS);
+  void      wait(jlong millis, bool interruptible, TRAPS, oop* object = NULL);
   void      notify(TRAPS);
   void      notifyAll(TRAPS);
 
@@ -337,10 +360,11 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
   bool      reenter(intx recursions, JavaThread* current);
 
  private:
-  void      AddWaiter(ObjectWaiter* waiter);
+  void      AddWaiter(ObjectWaiter* waiter, oop* object = NULL);
   void      INotify(JavaThread* current);
   ObjectWaiter* DequeueWaiter();
   void      DequeueSpecificWaiter(ObjectWaiter* waiter);
+  void      Waiter(ObjectWaiter* waiter);
   void      EnterI(JavaThread* current);
   void      ReenterI(JavaThread* current, ObjectWaiter* current_node);
   void      UnlinkAfterAcquire(JavaThread* current, ObjectWaiter* current_node);
