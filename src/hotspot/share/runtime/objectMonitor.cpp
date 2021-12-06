@@ -252,7 +252,7 @@ static void check_object_context() {
   Thread* self = Thread::current();
   if (self->is_Java_thread()) {
     // Mostly called from JavaThreads so sanity check the thread state.
-    JavaThread* jt = JavaThread::cast(self);
+    JavaThread* jt = self->as_Java_thread();
     switch (jt->thread_state()) {
     case _thread_in_vm:    // the usual case
     case _thread_in_Java:  // during deopt
@@ -284,9 +284,9 @@ ObjectMonitor::ObjectMonitor(oop object) :
   _SpinDuration(ObjectMonitor::Knob_SpinLimit),
   _contentions(0),
   _WaitSet(NULL),
-  _WaitSetCV(NULL),
   _waiters(0),
-  _WaitSetLock(0)
+  _WaitSetLock(0),
+  _objectID(object);
 { }
 
 ObjectMonitor::~ObjectMonitor() {
@@ -431,7 +431,7 @@ bool ObjectMonitor::enter(JavaThread* current) {
     for (;;) {
       ExitOnSuspend eos(this);
       {
-        ThreadBlockInVMPreprocess<ExitOnSuspend> tbivs(current, eos, true /* allow_suspend */);
+        ThreadBlockInVMPreprocess<ExitOnSuspend> tbivs(current, eos);
         EnterI(current);
         current->set_current_pending_monitor(NULL);
         // We can go to a safepoint at the end of this block. If we
@@ -486,7 +486,7 @@ bool ObjectMonitor::enter(JavaThread* current) {
     // just exited the monitor.
   }
   if (event.should_commit()) {
-    event.set_previousOwner(_previous_owner_tid);
+    event.set_previousOwner((uintptr_t)_previous_owner_tid);
     event.commit();
   }
   OM_PERFDATA_OP(ContendedLockAttempts, inc());
@@ -546,7 +546,7 @@ bool ObjectMonitor::deflate_monitor() {
     // Java threads. The GC already broke the association with the object.
     set_owner_from(NULL, DEFLATER_MARKER);
     assert(contentions() >= 0, "must be non-negative: contentions=%d", contentions());
-    _contentions = INT_MIN; // minimum negative int
+    _contentions = -max_jint;
   } else {
     // Attempt async deflation protocol.
 
@@ -573,7 +573,7 @@ bool ObjectMonitor::deflate_monitor() {
 
     // Make a zero contentions field negative to force any contending threads
     // to retry. This is the second part of the async deflation dance.
-    if (Atomic::cmpxchg(&_contentions, 0, INT_MIN) != 0) {
+    if (Atomic::cmpxchg(&_contentions, (jint)0, -max_jint) != 0) {
       // Contentions was no longer 0 so we lost the race since the
       // ObjectMonitor is now busy. Restore owner to NULL if it is
       // still DEFLATER_MARKER:
@@ -976,7 +976,7 @@ void ObjectMonitor::ReenterI(JavaThread* current, ObjectWaiter* currentNode) {
 
       {
         ClearSuccOnSuspend csos(this);
-        ThreadBlockInVMPreprocess<ClearSuccOnSuspend> tbivs(current, csos, true /* allow_suspend */);
+        ThreadBlockInVMPreprocess<ClearSuccOnSuspend> tbivs(current, csos);
         current->_ParkEvent->park();
       }
     }
@@ -1432,7 +1432,7 @@ bool ObjectMonitor::check_owner(TRAPS) {
 
 static void post_monitor_wait_event(EventJavaMonitorWait* event,
                                     ObjectMonitor* monitor,
-                                    uint64_t notifier_tid,
+                                    jlong notifier_tid,
                                     jlong timeout,
                                     bool timedout) {
   assert(event != NULL, "invariant");
@@ -1453,7 +1453,7 @@ static void post_monitor_wait_event(EventJavaMonitorWait* event,
 //
 // Note: a subset of changes to ObjectMonitor::wait()
 // will need to be replicated in complete_exit
-void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS, oop* object) {
+void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS, oop object) {
   JavaThread* current = THREAD;
 
   assert(InitDone, "Unexpectedly not initialized");
@@ -1537,7 +1537,7 @@ void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS, oop* object) {
 
     {
       ClearSuccOnSuspend csos(this);
-      ThreadBlockInVMPreprocess<ClearSuccOnSuspend> tbivs(current, csos, true /* allow_suspend */);
+      ThreadBlockInVMPreprocess<ClearSuccOnSuspend> tbivs(current, csos);
       if (interrupted || HAS_PENDING_EXCEPTION) {
         // Intentionally empty
       } else if (node._notified == 0) {
@@ -2089,59 +2089,23 @@ void ObjectWaiter::wait_reenter_end(ObjectMonitor * const mon) {
   JavaThreadBlockedOnMonitorEnterState::wait_reenter_end(_thread, _active);
 }
 
-inline void ObjectMonitor::AddWaiter(ObjectWaiter* node, oop* object) {
-  
-  if (object == NULL) {
-		assert(node != NULL, "should not add NULL node");
-		assert(node->_prev == NULL, "node already in list");
-		assert(node->_next == NULL, "node already in list");
-		// put node at end of queue (circular doubly linked list)
-		if (_WaitSet == NULL) {
-		  _WaitSet = node;
-		  node->_prev = node;
-		  node->_next = node;
-		} else {
-		  ObjectWaiter* head = _WaitSet;
-		  ObjectWaiter* tail = head->_prev;
-		  assert(tail->_next == head, "invariant check");
-		  tail->_next = node;
-		  head->_prev = node;
-		  node->_next = head;
-		  node->_prev = tail;
-		}
-  }
-  else if (_WaitSet->_object == object) {
-  	assert(node != NULL, "should not add NULL node");
-		assert(node->_prev == NULL, "node already in list");
-		assert(node->_next == NULL, "node already in list");
-		// put node at end of queue (circular doubly linked list)
-		if (_WaitSet == NULL) {
-		  _WaitSet = node;
-		  node->_prev = node;
-		  node->_next = node;
-		} else {
-		  ObjectWaiter* head = _WaitSet;
-		  ObjectWaiter* tail = head->_prev;
-		  assert(tail->_next == head, "invariant check");
-		  tail->_next = node;
-		  head->_prev = node;
-		  node->_next = head;
-		  node->_prev = tail;
-		}
-  }
-  else {
-		assert(node != NULL, "should not add NULL node");
-		assert(node->_prev == NULL, "node already in list");
-		assert(node->_next == NULL, "node already in list");
-		// put node at end of queue (circular doubly linked list)
-		if (_WaitSetCV == NULL) {
-			_WaitSetCV = node;
-			node->_prev = node;
-			node->_next = node;
-		} else {
-		  ObjectWaiter* temp = _WaitSetCV;
+inline void ObjectMonitor::AddWaiter(ObjectWaiter* node, oop object) {
+
+  if (object == NULL)
+    object = _objectID;
+    
+  assert(node != NULL, "should not add NULL node");
+  assert(node->_prev == NULL, "node already in list");
+  assert(node->_next == NULL, "node already in list");
+  // put node at end of queue (circular doubly linked list)
+  if (_WaitSet == NULL) {
+    _WaitSet = node;
+    node->_prev = node;
+    node->_next = node;
+  } else {
 			while (temp != NULL) {
-				if (object == temp->_object) {
+			  ObjectWaiter* temp = _WaitSet;
+				if (object->compare(object, temp->_object) {
 					ObjectWaiter* head = temp;
 					ObjectWaiter* tail = head->_prev;
 					assert(tail->_next == head, "invariant check");
@@ -2153,8 +2117,12 @@ inline void ObjectMonitor::AddWaiter(ObjectWaiter* node, oop* object) {
 				}
 		  	temp = temp->_nextWaitset;
 			}
-		}
+			node->_prev = node;
+			node->_next = node;
+			node->_nextWaitset = _WaitSet;
+			_WaitSet = node;
   }
+  return;
 }
 
 inline ObjectWaiter* ObjectMonitor::DequeueWaiter() {
@@ -2295,7 +2263,7 @@ void ObjectMonitor::print_debug_style_on(outputStream* st) const {
   st->print_cr("    [%d] = '\\0'", (int)sizeof(_pad_buf0) - 1);
   st->print_cr("  }");
   st->print_cr("  _owner = " INTPTR_FORMAT, p2i(owner_raw()));
-  st->print_cr("  _previous_owner_tid = " UINT64_FORMAT, _previous_owner_tid);
+  st->print_cr("  _previous_owner_tid = " JLONG_FORMAT, _previous_owner_tid);
   st->print_cr("  _pad_buf1 = {");
   st->print_cr("    [0] = '\\0'");
   st->print_cr("    ...");
