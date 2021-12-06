@@ -285,8 +285,9 @@ ObjectMonitor::ObjectMonitor(oop object) :
   _contentions(0),
   _WaitSet(NULL),
   _waiters(0),
-  _WaitSetLock(0),
-  _objectID(object);
+  _objectID(object),
+  _WaitSetLock(0)
+
 { }
 
 ObjectMonitor::~ObjectMonitor() {
@@ -2103,9 +2104,9 @@ inline void ObjectMonitor::AddWaiter(ObjectWaiter* node, oop object) {
     node->_prev = node;
     node->_next = node;
   } else {
+  	  ObjectWaiter* temp = _WaitSet;
 			while (temp != NULL) {
-			  ObjectWaiter* temp = _WaitSet;
-				if (object->compare(object, temp->_object) {
+				if (object->compare(object, temp->_object) == 0) {
 					ObjectWaiter* head = temp;
 					ObjectWaiter* tail = head->_prev;
 					assert(tail->_next == head, "invariant check");

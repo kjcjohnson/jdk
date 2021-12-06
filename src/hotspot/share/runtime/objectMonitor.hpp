@@ -176,7 +176,7 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
                                     // deflated. It is also used by the async deflation protocol. See
                                     // ObjectMonitor::deflate_monitor().
                                     
- oop _objectID;
+ volatile oop _objectID;
  
  protected:
   ObjectWaiter* volatile _WaitSet;  // LL of threads wait()ing on the monitor
