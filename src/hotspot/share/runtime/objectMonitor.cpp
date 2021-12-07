@@ -283,9 +283,9 @@ ObjectMonitor::ObjectMonitor(oop object) :
   _Spinner(0),
   _SpinDuration(ObjectMonitor::Knob_SpinLimit),
   _contentions(0),
+  _objectID(object),
   _WaitSet(NULL),
   _waiters(0),
-  _objectID(object),
   _WaitSetLock(0)
 
 { }
@@ -1674,9 +1674,9 @@ void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS, oop object) {
 // then instead of transferring a thread from the WaitSet to the EntryList
 // we might just dequeue a thread from the WaitSet and directly unpark() it.
 
-void ObjectMonitor::INotify(JavaThread* current) {
+void ObjectMonitor::INotify(JavaThread* current, oop object) {
   Thread::SpinAcquire(&_WaitSetLock, "WaitSet - notify");
-  ObjectWaiter* iterator = DequeueWaiter();
+  ObjectWaiter* iterator = DequeueWaiter(object);
   if (iterator != NULL) {
     guarantee(iterator->TState == ObjectWaiter::TS_WAIT, "invariant");
     guarantee(iterator->_notified == 0, "invariant");
@@ -2121,18 +2121,29 @@ inline void ObjectMonitor::AddWaiter(ObjectWaiter* node, oop object) {
 			node->_prev = node;
 			node->_next = node;
 			node->_nextWaitset = _WaitSet;
+			_WaitSet->_prevWaitset = node;
 			_WaitSet = node;
   }
   return;
 }
 
-inline ObjectWaiter* ObjectMonitor::DequeueWaiter() {
+inline ObjectWaiter* ObjectMonitor::DequeueWaiter(oop object) {
+	if (object == NULL)
+	  object = _objectID;
+	  
   // dequeue the very first waiter
-  ObjectWaiter* waiter = _WaitSet;
-  if (waiter) {
-    DequeueSpecificWaiter(waiter);
+  ObjectWaiter* temp = _WaitSet;
+  while (temp != NULL) {
+    if (object->compare(object, temp->_object) == 0) {
+      ObjectWaiter* waiter = temp;
+      if (waiter) {
+        DequeueSpecificWaiter(waiter);
+      }
+    }
+    temp = temp->_nextWaitset;
   }
-  return waiter;
+
+  return NULL;
 }
 
 inline void ObjectMonitor::DequeueSpecificWaiter(ObjectWaiter* node) {
@@ -2145,19 +2156,25 @@ inline void ObjectMonitor::DequeueSpecificWaiter(ObjectWaiter* node) {
   ObjectWaiter* next = node->_next;
   if (next == node) {
     assert(node->_prev == node, "invariant check");
-    _WaitSet = NULL;
   } else {
     ObjectWaiter* prev = node->_prev;
     assert(prev->_next == node, "invariant check");
     assert(next->_prev == node, "invariant check");
     next->_prev = prev;
     prev->_next = next;
-    if (_WaitSet == node) {
-      _WaitSet = next;
-    }
   }
+  
+  if (node->_nextWaitset != NULL)
+    node->_nextWaitset->_prevWaitset = node->_prevWaitset;
+  if (node->_prevWaitset != NULL)
+    node->_prevWaitset->_nextWaitset = node->_nextWaitset;
+  if (_WaitSet == node)
+    _WaitSet = node->_nextWaitset;
+    
   node->_next = NULL;
   node->_prev = NULL;
+  node->_nextWaitset = NULL;
+  node->_prevWaitset = NULL;
 }
 
 // -----------------------------------------------------------------------------

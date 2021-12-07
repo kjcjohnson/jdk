@@ -176,7 +176,7 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
                                     // deflated. It is also used by the async deflation protocol. See
                                     // ObjectMonitor::deflate_monitor().
                                     
- volatile oop _objectID;
+ oop _objectID;
  
  protected:
   ObjectWaiter* volatile _WaitSet;  // LL of threads wait()ing on the monitor
@@ -356,8 +356,8 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
 
  private:
   void      AddWaiter(ObjectWaiter* waiter, oop object = NULL);
-  void      INotify(JavaThread* current);
-  ObjectWaiter* DequeueWaiter();
+  void      INotify(JavaThread* current, oop object = NULL);
+  ObjectWaiter* DequeueWaiter(oop object = NULL);
   void      DequeueSpecificWaiter(ObjectWaiter* waiter);
   void      EnterI(JavaThread* current);
   void      ReenterI(JavaThread* current, ObjectWaiter* current_node);
