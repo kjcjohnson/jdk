@@ -2444,7 +2444,7 @@ public abstract class JComponent extends Container implements Serializable,
      * Similarly, if <code>condition</code> is not one of the values
      * listed, an <code>IllegalArgumentException</code> will be thrown.
      *
-     * @param condition one of the values listed above
+     * @param conditiona one of the values listed above
      * @param map  the <code>InputMap</code> to use for the given condition
      * @exception IllegalArgumentException if <code>condition</code> is
      *          <code>WHEN_IN_FOCUSED_WINDOW</code> and <code>map</code>
@@ -2453,8 +2453,8 @@ public abstract class JComponent extends Container implements Serializable,
      *          specified above
      * @since 1.3
      */
-    public final void setInputMap(int condition, InputMap map) {
-        switch (condition) {
+    public final void setInputMap(int conditiona, InputMap map) {
+        switch (conditiona) {
         case WHEN_IN_FOCUSED_WINDOW:
             if (map != null && !(map instanceof ComponentInputMap)) {
                 throw new IllegalArgumentException("WHEN_IN_FOCUSED_WINDOW InputMaps must be of type ComponentInputMap");
@@ -2480,14 +2480,14 @@ public abstract class JComponent extends Container implements Serializable,
      * Returns the <code>InputMap</code> that is used during
      * <code>condition</code>.
      *
-     * @param condition one of WHEN_IN_FOCUSED_WINDOW, WHEN_FOCUSED,
+     * @param conditiona one of WHEN_IN_FOCUSED_WINDOW, WHEN_FOCUSED,
      *        WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
      * @return the <code>InputMap</code> for the specified
      *          <code>condition</code>
      * @since 1.3
      */
-    public final InputMap getInputMap(int condition) {
-        return getInputMap(condition, true);
+    public final InputMap getInputMap(int conditiona) {
+        return getInputMap(conditiona, true);
     }
 
     /**
@@ -2534,7 +2534,7 @@ public abstract class JComponent extends Container implements Serializable,
      * been created, and <code>create</code> is
      * true, it will be created.
      *
-     * @param condition one of the following values:
+     * @param conditiona one of the following values:
      * <ul>
      * <li>JComponent.FOCUS_INPUTMAP_CREATED
      * <li>JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
@@ -2548,8 +2548,8 @@ public abstract class JComponent extends Container implements Serializable,
      * @exception IllegalArgumentException if <code>condition</code>
      *          is not one of the legal values listed above
      */
-    final InputMap getInputMap(int condition, boolean create) {
-        switch (condition) {
+    final InputMap getInputMap(int conditiona, boolean create) {
+        switch (conditiona) {
         case WHEN_FOCUSED:
             if (getFlag(FOCUS_INPUTMAP_CREATED)) {
                 return focusInputMap;
@@ -2557,7 +2557,7 @@ public abstract class JComponent extends Container implements Serializable,
             // Hasn't been created yet.
             if (create) {
                 InputMap km = new InputMap();
-                setInputMap(condition, km);
+                setInputMap(conditiona, km);
                 return km;
             }
             break;
@@ -2568,7 +2568,7 @@ public abstract class JComponent extends Container implements Serializable,
             // Hasn't been created yet.
             if (create) {
                 InputMap km = new InputMap();
-                setInputMap(condition, km);
+                setInputMap(conditiona, km);
                 return km;
             }
             break;
@@ -2579,7 +2579,7 @@ public abstract class JComponent extends Container implements Serializable,
             // Hasn't been created yet.
             if (create) {
                 ComponentInputMap km = new ComponentInputMap(this);
-                setInputMap(condition, km);
+                setInputMap(conditiona, km);
                 return km;
             }
             break;
@@ -2922,7 +2922,7 @@ public abstract class JComponent extends Container implements Serializable,
      *
      * @param ks  the <code>KeyStroke</code> queried
      * @param e the <code>KeyEvent</code>
-     * @param condition one of the following values:
+     * @param conditiona one of the following values:
      * <ul>
      * <li>JComponent.WHEN_FOCUSED
      * <li>JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
@@ -2936,8 +2936,8 @@ public abstract class JComponent extends Container implements Serializable,
      */
     @SuppressWarnings({"deprecation", "removal"})
     protected boolean processKeyBinding(KeyStroke ks, KeyEvent e,
-                                        int condition, boolean pressed) {
-        InputMap map = getInputMap(condition, false);
+                                        int conditiona, boolean pressed) {
+        InputMap map = getInputMap(conditiona, false);
         ActionMap am = getActionMap(false);
 
         if(map != null && am != null && isEnabled()) {

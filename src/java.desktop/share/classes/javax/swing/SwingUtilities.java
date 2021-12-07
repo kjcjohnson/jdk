@@ -1870,14 +1870,14 @@ public class SwingUtilities implements SwingConstants
      * of the specified type.
      *
      * @param component a component
-     * @param condition a condition
+     * @param conditiona a condition
      * @return the {@code ActionMap} provided by the UI for {@code condition}
      *         in the component, or {@code null} if the UI has not installed
      *         an InputMap of the specified type.
      * @since 1.3
      */
-    public static InputMap getUIInputMap(JComponent component, int condition) {
-        InputMap map = component.getInputMap(condition, false);
+    public static InputMap getUIInputMap(JComponent component, int conditiona) {
+        InputMap map = component.getInputMap(conditiona, false);
         while (map != null) {
             InputMap parent = map.getParent();
             if (parent instanceof UIResource) {

@@ -679,14 +679,14 @@ public class JMenuBar extends JComponent implements Accessible,MenuElement
      * @since 1.3
      */
     protected boolean processKeyBinding(KeyStroke ks, KeyEvent e,
-                                        int condition, boolean pressed) {
+                                        int conditiona, boolean pressed) {
         // See if we have a local binding.
-        boolean retValue = super.processKeyBinding(ks, e, condition, pressed);
+        boolean retValue = super.processKeyBinding(ks, e, conditiona, pressed);
         if (!retValue) {
             MenuElement[] subElements = getSubElements();
             for (MenuElement subElement : subElements) {
                 if (processBindingForKeyStrokeRecursive(
-                        subElement, ks, e, condition, pressed)) {
+                        subElement, ks, e, conditiona, pressed)) {
                     return true;
                 }
             }
@@ -695,7 +695,7 @@ public class JMenuBar extends JComponent implements Accessible,MenuElement
     }
 
     static boolean processBindingForKeyStrokeRecursive(MenuElement elem,
-                                                       KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+                                                       KeyStroke ks, KeyEvent e, int conditiona, boolean pressed) {
         if (elem == null) {
             return false;
         }
@@ -707,14 +707,14 @@ public class JMenuBar extends JComponent implements Accessible,MenuElement
         }
 
         if (c != null && c instanceof JComponent &&
-            ((JComponent)c).processKeyBinding(ks, e, condition, pressed)) {
+            ((JComponent)c).processKeyBinding(ks, e, conditiona, pressed)) {
 
             return true;
         }
 
         MenuElement[] subElements = elem.getSubElements();
         for (MenuElement subElement : subElements) {
-            if (processBindingForKeyStrokeRecursive(subElement, ks, e, condition, pressed)) {
+            if (processBindingForKeyStrokeRecursive(subElement, ks, e, conditiona, pressed)) {
                 return true;
                 // We don't, pass along to children JMenu's
             }

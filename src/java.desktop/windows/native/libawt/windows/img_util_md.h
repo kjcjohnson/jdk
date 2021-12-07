@@ -77,16 +77,16 @@ extern uns_ordered_dither_array img_oda_alpha;
 
 #ifdef DEBUG
 #undef img_check
-#define img_check(condition)                                    \
+#define img_check(conditiona)                                   \
     do {                                                        \
-        if (!(condition)) {                                     \
+        if (!(conditiona)) {                                    \
             SignalError(0, JAVAPKG "InternalError",             \
-                        "assertion failed:  " #condition);      \
+                        "assertion failed:  " #conditiona);     \
             return SCALEFAILURE;                                \
         }                                                       \
     } while (0)
 #else /* DEBUG */
-#define img_check(condition)    do {} while (0)
+#define img_check(conditiona)    do {} while (0)
 #endif /* DEBUG */
 
 void color_init();

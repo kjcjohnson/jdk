@@ -54,7 +54,7 @@ class WaitDispatchSupport implements SecondaryLoop {
     private EventFilter filter;
 
     private volatile Conditional extCondition;
-    private volatile Conditional condition;
+    private volatile Conditional conditiona;
 
     private long interval;
     // Use a shared daemon timer to serve all the WaitDispatchSupports
@@ -106,7 +106,7 @@ class WaitDispatchSupport implements SecondaryLoop {
 
         this.dispatchThread = dispatchThread;
         this.extCondition = extCond;
-        this.condition = new Conditional() {
+        this.conditiona = new Conditional() {
             @Override
             public boolean evaluate() {
                 if (log.isLoggable(PlatformLogger.Level.FINEST)) {
@@ -186,9 +186,9 @@ class WaitDispatchSupport implements SecondaryLoop {
                 public void run() {
                     log.fine("Starting a new event pump");
                     if (filter == null) {
-                        dispatchThread.pumpEvents(condition);
+                        dispatchThread.pumpEvents(conditiona);
                     } else {
-                        dispatchThread.pumpEventsForFilter(condition, filter);
+                        dispatchThread.pumpEventsForFilter(conditiona, filter);
                     }
                 }
             };

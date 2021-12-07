@@ -144,8 +144,8 @@ public class BasicMenuBarUI extends MenuBarUI  {
                                            "MenuBar.actionMap");
     }
 
-    InputMap getInputMap(int condition) {
-        if (condition == JComponent.WHEN_IN_FOCUSED_WINDOW) {
+    InputMap getInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_IN_FOCUSED_WINDOW) {
             Object[] bindings = (Object[])DefaultLookup.get
                                 (menuBar, this, "MenuBar.windowBindings");
             if (bindings != null) {

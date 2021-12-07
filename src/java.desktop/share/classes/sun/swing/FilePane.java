@@ -1226,13 +1226,13 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         @SuppressWarnings("serial") // anonymous class
         final JTable detailsTable = new JTable(getDetailsTableModel()) {
             // Handle Escape key events here
-            protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+            protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int conditiona, boolean pressed) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE && getCellEditor() == null) {
                     // We are not editing, forward to filechooser.
                     chooser.dispatchEvent(e);
                     return true;
                 }
-                return super.processKeyBinding(ks, e, condition, pressed);
+                return super.processKeyBinding(ks, e, conditiona, pressed);
             }
 
             public void tableChanged(TableModelEvent e) {

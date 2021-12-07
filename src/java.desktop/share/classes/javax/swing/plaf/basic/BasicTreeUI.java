@@ -962,12 +962,12 @@ public class BasicTreeUI extends TreeUI
                                            "Tree.actionMap");
     }
 
-    InputMap getInputMap(int condition) {
-        if (condition == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
+    InputMap getInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
             return (InputMap)DefaultLookup.get(tree, this,
                                                "Tree.ancestorInputMap");
         }
-        else if (condition == JComponent.WHEN_FOCUSED) {
+        else if (conditiona == JComponent.WHEN_FOCUSED) {
             InputMap keyMap = (InputMap)DefaultLookup.get(tree, this,
                                                       "Tree.focusInputMap");
             InputMap rtlKeyMap;

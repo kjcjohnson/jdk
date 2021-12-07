@@ -263,8 +263,8 @@ public class BasicFileChooserUI extends FileChooserUI {
         SwingUtilities.replaceUIActionMap(fc, actionMap);
     }
 
-    InputMap getInputMap(int condition) {
-        if (condition == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
+    InputMap getInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
             return (InputMap)DefaultLookup.get(getFileChooser(), this,
                     "FileChooser.ancestorInputMap");
         }

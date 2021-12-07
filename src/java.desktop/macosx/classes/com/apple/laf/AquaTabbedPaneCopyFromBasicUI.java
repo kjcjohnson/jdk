@@ -469,10 +469,10 @@ public class AquaTabbedPaneCopyFromBasicUI extends TabbedPaneUI implements Swing
         updateMnemonics();
     }
 
-    InputMap getInputMap(final int condition) {
-        if (condition == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
+    InputMap getInputMap(final int conditiona) {
+        if (conditiona == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
             return (InputMap)DefaultLookup.get(tabPane, this, "TabbedPane.ancestorInputMap");
-        } else if (condition == JComponent.WHEN_FOCUSED) {
+        } else if (conditiona == JComponent.WHEN_FOCUSED) {
             return (InputMap)DefaultLookup.get(tabPane, this, "TabbedPane.focusInputMap");
         }
         return null;

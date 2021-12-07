@@ -159,19 +159,19 @@ public class BasicRootPaneUI extends RootPaneUI implements
         SwingUtilities.replaceUIActionMap(root, null);
     }
 
-    InputMap getInputMap(int condition, JComponent c) {
-        if (condition == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
+    InputMap getInputMap(int conditiona, JComponent c) {
+        if (conditiona == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
             return (InputMap)DefaultLookup.get(c, this,
                                        "RootPane.ancestorInputMap");
         }
 
-        if (condition == JComponent.WHEN_IN_FOCUSED_WINDOW) {
-            return createInputMap(condition, c);
+        if (conditiona == JComponent.WHEN_IN_FOCUSED_WINDOW) {
+            return createInputMap(conditiona, c);
         }
         return null;
     }
 
-    ComponentInputMap createInputMap(int condition, JComponent c) {
+    ComponentInputMap createInputMap(int conditiona, JComponent c) {
         return new RootPaneInputMap(c);
     }
 

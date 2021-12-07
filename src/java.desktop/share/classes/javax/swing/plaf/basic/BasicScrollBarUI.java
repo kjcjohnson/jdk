@@ -369,8 +369,8 @@ public class BasicScrollBarUI
         SwingUtilities.replaceUIActionMap(scrollbar, null);
     }
 
-    private InputMap getInputMap(int condition) {
-        if (condition == JComponent.WHEN_FOCUSED) {
+    private InputMap getInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_FOCUSED) {
             InputMap keyMap = (InputMap)DefaultLookup.get(
                         scrollbar, this, "ScrollBar.focusInputMap");
             InputMap rtlKeyMap;
@@ -383,7 +383,7 @@ public class BasicScrollBarUI
                 return rtlKeyMap;
             }
         }
-        else if (condition == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
+        else if (conditiona == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
             InputMap keyMap = (InputMap)DefaultLookup.get(
                         scrollbar, this, "ScrollBar.ancestorInputMap");
             InputMap rtlKeyMap;
