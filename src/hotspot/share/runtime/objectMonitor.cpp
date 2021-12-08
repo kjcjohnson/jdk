@@ -751,7 +751,7 @@ void ObjectMonitor::EnterI(JavaThread* current) {
   // as well as eliminate a subset of ABA issues.
   // TODO: eliminate ObjectWaiter and enqueue either Threads or Events.
 
-  ObjectWaiter node(current);
+  ObjectWaiter node(current, _objectID);
   current->_ParkEvent->reset();
   node._prev   = (ObjectWaiter*) 0xBAD;
   node.TState  = ObjectWaiter::TS_CXQ;
@@ -1455,6 +1455,9 @@ static void post_monitor_wait_event(EventJavaMonitorWait* event,
 // Note: a subset of changes to ObjectMonitor::wait()
 // will need to be replicated in complete_exit
 void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS, oop object) {
+  if (object == NULL)
+    object = _objectID;
+
   JavaThread* current = THREAD;
 
   assert(InitDone, "Unexpectedly not initialized");
@@ -1493,7 +1496,7 @@ void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS, oop object) {
   // create a node to be put into the queue
   // Critically, after we reset() the event but prior to park(), we must check
   // for a pending interrupt.
-  ObjectWaiter node(current);
+  ObjectWaiter node(current, object);
   node.TState = ObjectWaiter::TS_WAIT;
   current->_ParkEvent->reset();
   OrderAccess::fence();          // ST into Event; membar ; LD interrupted-flag
@@ -1736,14 +1739,14 @@ void ObjectMonitor::INotify(JavaThread* current, oop object) {
 // and the program does not hang whereas it did absent "minimum wait",
 // that suggests a lost wakeup bug.
 
-void ObjectMonitor::notify(TRAPS) {
+void ObjectMonitor::notify(TRAPS, oop object) {
   JavaThread* current = THREAD;
   CHECK_OWNER();  // Throws IMSE if not owner.
   if (_WaitSet == NULL) {
     return;
   }
   DTRACE_MONITOR_PROBE(notify, this, object(), current);
-  INotify(current);
+  INotify(current, object);
   OM_PERFDATA_OP(Notifications, inc(1));
 }
 
@@ -1755,7 +1758,7 @@ void ObjectMonitor::notify(TRAPS) {
 // waitset is "ABCD" and the EntryList is "XYZ". After a notifyAll() in prepend
 // mode the waitset will be empty and the EntryList will be "DCBAXYZ".
 
-void ObjectMonitor::notifyAll(TRAPS) {
+void ObjectMonitor::notifyAll(TRAPS, oop object) {
   JavaThread* current = THREAD;
   CHECK_OWNER();  // Throws IMSE if not owner.
   if (_WaitSet == NULL) {
@@ -1764,9 +1767,9 @@ void ObjectMonitor::notifyAll(TRAPS) {
 
   DTRACE_MONITOR_PROBE(notifyAll, this, object(), current);
   int tally = 0;
-  while (_WaitSet != NULL) {
+  while (first_waiter(object) != NULL) {
     tally++;
-    INotify(current);
+    INotify(current, object);
   }
 
   OM_PERFDATA_OP(Notifications, inc(tally));
@@ -2067,12 +2070,12 @@ int ObjectMonitor::NotRunnable(JavaThread* current, JavaThread* ox) {
 // -----------------------------------------------------------------------------
 // WaitSet management ...
 
-ObjectWaiter::ObjectWaiter(JavaThread* current) {
+ObjectWaiter::ObjectWaiter(JavaThread* current, oop object) {
   _next     = NULL;
   _prev     = NULL;
   _nextWaitset = NULL;
   _prevWaitset = NULL;
-  _object = NULL;
+  _object = object;
   _notified = 0;
   _notifier_tid = 0;
   TState    = TS_RUN;
@@ -2139,6 +2142,7 @@ inline ObjectWaiter* ObjectMonitor::DequeueWaiter(oop object) {
       if (waiter) {
         DequeueSpecificWaiter(waiter);
       }
+      return waiter;
     }
     temp = temp->_nextWaitset;
   }

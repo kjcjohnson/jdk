@@ -56,7 +56,7 @@ class ObjectWaiter : public StackObj {
   volatile TStates TState;
   bool          _active;           // Contention monitoring is enabled
  public:
-  ObjectWaiter(JavaThread* current);
+  ObjectWaiter(JavaThread* current, oop object = NULL);
 
   void wait_reenter_begin(ObjectMonitor *mon);
   void wait_reenter_end(ObjectMonitor *mon);
@@ -341,8 +341,8 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
   bool      enter(JavaThread* current);
   void      exit(JavaThread* current, bool not_suspended = true);
   void      wait(jlong millis, bool interruptible, TRAPS, oop object = NULL);
-  void      notify(TRAPS);
-  void      notifyAll(TRAPS);
+  void      notify(TRAPS, oop object = NULL);
+  void      notifyAll(TRAPS, oop object = NULL);
 
   void      print() const;
 #ifdef ASSERT
