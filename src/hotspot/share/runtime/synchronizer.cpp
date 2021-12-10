@@ -636,7 +636,7 @@ ObjectLocker::~ObjectLocker() {
 // -----------------------------------------------------------------------------
 //  Wait/Notify/NotifyAll
 // NOTE: must use heavy weight monitor to handle wait()
-int ObjectSynchronizer::wait(Handle obj, jlong millis, TRAPS) {
+int ObjectSynchronizer::wait(Handle obj, jlong millis, TRAPS, oop cv) {
   JavaThread* current = THREAD;
   if (UseBiasedLocking) {
     BiasedLocking::revoke(current, obj);
@@ -651,7 +651,7 @@ int ObjectSynchronizer::wait(Handle obj, jlong millis, TRAPS) {
   ObjectMonitor* monitor = inflate(current, obj(), inflate_cause_wait);
 
   DTRACE_MONITOR_WAIT_PROBE(monitor, obj(), current, millis);
-  monitor->wait(millis, true, THREAD); // Not CHECK as we need following code
+  monitor->wait(millis, true, THREAD, cv); // Not CHECK as we need following code
 
   // This dummy call is in place to get around dtrace bug 6254741.  Once
   // that's fixed we can uncomment the following line, remove the call
@@ -675,7 +675,7 @@ void ObjectSynchronizer::wait_uninterruptibly(Handle obj, JavaThread* current) {
   monitor->wait(0 /* wait-forever */, false /* not interruptible */, current);
 }
 
-void ObjectSynchronizer::notify(Handle obj, TRAPS) {
+void ObjectSynchronizer::notify(Handle obj, TRAPS, oop cv) {
   JavaThread* current = THREAD;
   if (UseBiasedLocking) {
     BiasedLocking::revoke(current, obj);
@@ -690,11 +690,11 @@ void ObjectSynchronizer::notify(Handle obj, TRAPS) {
   // The ObjectMonitor* can't be async deflated until ownership is
   // dropped by the calling thread.
   ObjectMonitor* monitor = inflate(current, obj(), inflate_cause_notify);
-  monitor->notify(CHECK);
+  monitor->notify(CHECK, cv);
 }
 
 // NOTE: see comment of notify()
-void ObjectSynchronizer::notifyall(Handle obj, TRAPS) {
+void ObjectSynchronizer::notifyall(Handle obj, TRAPS, oop cv) {
   JavaThread* current = THREAD;
   if (UseBiasedLocking) {
     BiasedLocking::revoke(current, obj);
@@ -709,7 +709,7 @@ void ObjectSynchronizer::notifyall(Handle obj, TRAPS) {
   // The ObjectMonitor* can't be async deflated until ownership is
   // dropped by the calling thread.
   ObjectMonitor* monitor = inflate(current, obj(), inflate_cause_notify);
-  monitor->notifyAll(CHECK);
+  monitor->notifyAll(CHECK, cv);
 }
 
 // -----------------------------------------------------------------------------

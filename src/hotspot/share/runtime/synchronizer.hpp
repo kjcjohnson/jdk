@@ -97,9 +97,9 @@ class ObjectSynchronizer : AllStatic {
   static void jni_exit(oop obj, TRAPS);
 
   // Handle all interpreter, compiler and jni cases
-  static int  wait(Handle obj, jlong millis, TRAPS);
-  static void notify(Handle obj, TRAPS);
-  static void notifyall(Handle obj, TRAPS);
+  static int  wait(Handle obj, jlong millis, TRAPS, oop cv = NULL);
+  static void notify(Handle obj, TRAPS, oop cv = NULL);
+  static void notifyall(Handle obj, TRAPS, oop cv = NULL);
 
   static bool quick_notify(oopDesc* obj, JavaThread* current, bool All);
   static bool quick_enter(oop obj, JavaThread* current, BasicLock* Lock);
