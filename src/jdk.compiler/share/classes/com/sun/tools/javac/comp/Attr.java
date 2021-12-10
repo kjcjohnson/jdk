@@ -4886,6 +4886,10 @@ public class Attr extends JCTree.Visitor {
         result = check(tree, syms.typeOfTag[tree.typetag.ordinal()], KindSelector.TYP, resultInfo);
     }
 
+    public void visitTypeCondition(JCConditionTypeTree tree) {
+	result = check(tree, syms.typeOfTag[tree.typetag.ordinal()], KindSelector.TYP, resultInfo);
+    }
+
     public void visitTypeArray(JCArrayTypeTree tree) {
         Type etype = attribType(tree.elemtype, env);
         Type type = new ArrayType(etype, syms.arrayClass);
@@ -5711,6 +5715,10 @@ public class Attr extends JCTree.Visitor {
             if (type.isPrimitiveOrVoid()) {
                 return;
             }
+
+	    if(type.isCondition()) {
+		return;
+	    }
 
             JCTree enclTr = errtree;
             Type enclTy = type;

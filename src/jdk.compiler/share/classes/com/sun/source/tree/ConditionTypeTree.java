@@ -2,6 +2,8 @@
 
 package com.sun.source.tree;
 
+import javax.lang.model.type.TypeKind;
+
 /**
  * A tree node for a condition type
  *
@@ -19,8 +21,8 @@ package com.sun.source.tree;
  */
 public interface ConditionTypeTree extends Tree {
    /**
-    * maybe a function here
-    *
+    * Returns the kind of this tree
+    * @return the kind of condition
     */
-//   maybe a function here?
+    TypeKind getConditionTypeKind();
 }

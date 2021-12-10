@@ -42,32 +42,32 @@ import static com.sun.tools.javac.code.TypeTag.NumericClasses.*;
 public enum TypeTag {
     /** The tag of the basic type `byte'.
      */
-    BYTE(BYTE_CLASS, BYTE_SUPERCLASSES, true),
+    BYTE(BYTE_CLASS, BYTE_SUPERCLASSES, true, false),
 
     /** The tag of the basic type `char'.
      */
-    CHAR(CHAR_CLASS, CHAR_SUPERCLASSES, true),
+    CHAR(CHAR_CLASS, CHAR_SUPERCLASSES, true, false),
 
     /** The tag of the basic type `short'.
      */
-    SHORT(SHORT_CLASS, SHORT_SUPERCLASSES, true),
+    SHORT(SHORT_CLASS, SHORT_SUPERCLASSES, true, false),
 
     /** The tag of the basic type `long'.
      */
-    LONG(LONG_CLASS, LONG_SUPERCLASSES, true),
+    LONG(LONG_CLASS, LONG_SUPERCLASSES, true, false),
 
     /** The tag of the basic type `float'.
      */
-    FLOAT(FLOAT_CLASS, FLOAT_SUPERCLASSES, true),
+    FLOAT(FLOAT_CLASS, FLOAT_SUPERCLASSES, true, false),
     /** The tag of the basic type `int'.
      */
-    INT(INT_CLASS, INT_SUPERCLASSES, true),
+    INT(INT_CLASS, INT_SUPERCLASSES, true, false),
     /** The tag of the basic type `double'.
      */
-    DOUBLE(DOUBLE_CLASS, DOUBLE_CLASS, true),
+    DOUBLE(DOUBLE_CLASS, DOUBLE_CLASS, true, false),
     /** The tag of the basic type `boolean'.
      */
-    BOOLEAN(0, 0, true),
+    BOOLEAN(0, 0, true, false),
 
     /** The tag of the type `void'.
      */
@@ -76,6 +76,10 @@ public enum TypeTag {
     /** The tag of all class and interface types.
      */
     CLASS,
+
+    /** The tag of all condition types.
+     */
+    CONDITION(0, 0, false, true),
 
     /** The tag of all array types.
      */
@@ -138,15 +142,17 @@ public enum TypeTag {
     final int superClasses;
     final int numericClass;
     final boolean isPrimitive;
+    final boolean isCondition;
 
     private TypeTag() {
-        this(0, 0, false);
+        this(0, 0, false, false);
     }
 
-    private TypeTag(int numericClass, int superClasses, boolean isPrimitive) {
+    private TypeTag(int numericClass, int superClasses, boolean isPrimitive, boolean isCondition) {
         this.superClasses = superClasses;
         this.numericClass = numericClass;
         this.isPrimitive = isPrimitive;
+        this.isCondition = isCondition;
     }
 
     public static class NumericClasses {

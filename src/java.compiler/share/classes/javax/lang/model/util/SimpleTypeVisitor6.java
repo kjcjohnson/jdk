@@ -171,6 +171,17 @@ public class SimpleTypeVisitor6<R, P> extends AbstractTypeVisitor6<R, P> {
     /**
      * {@inheritDoc}
      *
+     * @param t {@inheritDoc}
+     * @param p {@inheritDoc}
+     * @return  the result of {@code defaultAction}
+     */
+    public R visitCondition(ConditionType t, P p) {
+	return defaultAction(t, p);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @implSpec This implementation calls {@code defaultAction}.
      *
      * @param t {@inheritDoc}

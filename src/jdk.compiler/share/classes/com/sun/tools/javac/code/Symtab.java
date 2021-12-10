@@ -50,6 +50,7 @@ import com.sun.tools.javac.code.Type.ClassType;
 import com.sun.tools.javac.code.Type.ErrorType;
 import com.sun.tools.javac.code.Type.JCPrimitiveType;
 import com.sun.tools.javac.code.Type.JCVoidType;
+import com.sun.tools.javac.code.Type.JCConditionType;
 import com.sun.tools.javac.code.Type.MethodType;
 import com.sun.tools.javac.code.Type.UnknownType;
 import com.sun.tools.javac.code.Types.UniqueType;
@@ -105,6 +106,7 @@ public class Symtab {
     public final JCPrimitiveType booleanType = new JCPrimitiveType(BOOLEAN, null);
     public final Type botType = new BottomType();
     public final JCVoidType voidType = new JCVoidType();
+    public final JCConditionType conditionType = new JCConditionType(CONDITION, null);
 
     private final Names names;
     private final JavacMessages messages;
@@ -470,6 +472,7 @@ public class Symtab {
         initType(botType, "<nulltype>");
         initType(errType, errSymbol);
         initType(unknownType, unknownSymbol);
+	initType(conditionType, "condition");
 
         // the builtin class of all arrays
         arrayClass = new ClassSymbol(PUBLIC|ACYCLIC, names.Array, noSymbol);
@@ -501,6 +504,7 @@ public class Symtab {
         scope.enter(doubleType.tsym);
         scope.enter(booleanType.tsym);
         scope.enter(errType.tsym);
+	scope.enter(conditionType.tsym);
 
         // Enter symbol for the errSymbol
         scope.enter(errSymbol);

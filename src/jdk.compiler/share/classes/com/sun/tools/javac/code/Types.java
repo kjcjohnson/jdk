@@ -1121,6 +1121,7 @@ public class Types {
                          s.hasTag(BOT) || s.hasTag(CLASS) ||
                          s.hasTag(ARRAY) || s.hasTag(TYPEVAR);
                  case WILDCARD: //we shouldn't be here - avoids crash (see 7034495)
+		 case CONDITION:
                  case NONE:
                      return false;
                  default:
@@ -5112,6 +5113,10 @@ public class Types {
                     assembleClassSig(type);
                     append(';');
                     break;
+		case CONDITION:
+		    String str = "Ljava/lang/Object;";
+		    append(str.getBytes());
+		    break;
                 case ARRAY:
                     ArrayType at = (ArrayType) type;
                     append('[');

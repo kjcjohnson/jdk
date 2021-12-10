@@ -409,6 +409,10 @@ public class TreeTranslator extends JCTree.Visitor {
         result = tree;
     }
 
+    public void visitTypeCondition(JCConditionTypeTree tree) {
+	result = tree;
+    }
+
     public void visitTypeArray(JCArrayTypeTree tree) {
         tree.elemtype = translate(tree.elemtype);
         result = tree;

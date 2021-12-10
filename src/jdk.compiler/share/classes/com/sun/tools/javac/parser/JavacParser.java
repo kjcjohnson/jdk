@@ -2018,7 +2018,7 @@ public class JavacParser implements Parser {
     /** Condition = CONDITION
      */
     JCConditionTypeTree conditionType() {
-	System.out.println("Condition type declared");
+//	System.out.println("Condition type declared");
 	JCConditionTypeTree t = to(F.at(token.pos).TypeCondition());
 	nextToken();
 	return t;

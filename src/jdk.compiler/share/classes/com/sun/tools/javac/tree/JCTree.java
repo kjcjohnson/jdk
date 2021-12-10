@@ -2685,19 +2685,20 @@ public abstract class JCTree implements Tree, Cloneable, DiagnosticPosition {
      * Identifies a condition type
      */
     public static class JCConditionTypeTree extends JCExpression implements ConditionTypeTree {
-//
+	public TypeTag typetag;
+
 	protected JCConditionTypeTree() {
-//
+	    this.typetag = TypeTag.CONDITION;
 	}
 	@Override
 	public void accept(Visitor v) { v.visitTypeCondition(this); }
 
 	@DefinedBy(Api.COMPILER_TREE)
 	public Kind getKind() { return Kind.CONDITION_TYPE; }
-//	@DefinedBy(Api.COMPITER_TREE)
-//	public a function here
-//		return something;
-//	}
+	@DefinedBy(Api.COMPILER_TREE)
+	public TypeKind getConditionTypeKind() {
+		return TypeKind.CONDITION;
+	}
 
 	@Override @DefinedBy(Api.COMPILER_TREE)
 	public <R,D> R accept(TreeVisitor<R,D> v, D d) {
