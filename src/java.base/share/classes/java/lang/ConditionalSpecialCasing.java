@@ -169,8 +169,8 @@ final class ConditionalSpecialCasing {
         return ret;
     }
 
-    private static boolean isConditionMet(String src, int index, Locale locale, int condition) {
-        return switch (condition) {
+    private static boolean isConditionMet(String src, int index, Locale locale, int conditiona) {
+        return switch (conditiona) {
             case FINAL_CASED       -> isFinalCased(src, index, locale);
             case AFTER_SOFT_DOTTED -> isAfterSoftDotted(src, index);
             case MORE_ABOVE        -> isMoreAbove(src, index);
@@ -427,14 +427,14 @@ final class ConditionalSpecialCasing {
         char [] lower;
         char [] upper;
         String lang;
-        int condition;
+        int conditiona;
 
-        Entry(int ch, char[] lower, char[] upper, String lang, int condition) {
+        Entry(int ch, char[] lower, char[] upper, String lang, int conditiona) {
             this.ch = ch;
             this.lower = lower;
             this.upper = upper;
             this.lang = lang;
-            this.condition = condition;
+            this.conditiona = conditiona;
         }
 
         int getCodePoint() {
@@ -454,7 +454,7 @@ final class ConditionalSpecialCasing {
         }
 
         int getCondition() {
-            return condition;
+            return conditiona;
         }
     }
 }

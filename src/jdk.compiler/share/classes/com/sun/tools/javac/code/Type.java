@@ -169,6 +169,10 @@ public abstract class Type extends AnnoConstruct implements TypeMirror, PoolCons
         return false;
     }
 
+    public boolean isCondition() {
+	return false;
+    }
+
     public boolean isReference() {
         return false;
     }
@@ -814,6 +818,53 @@ public abstract class Type extends AnnoConstruct implements TypeMirror, PoolCons
             throw new AssertionError();
         }
 
+    }
+
+    public static class JCConditionType extends Type
+	implements javax.lang.model.type.ConditionType {
+
+	TypeTag tag;
+
+	public JCConditionType(TypeTag tag, TypeSymbol tsym) {
+		this(tag, tsym, TypeMetadata.EMPTY);
+	}
+
+	private JCConditionType(TypeTag tag, TypeSymbol tsym, TypeMetadata metadata) {
+		super(tsym, metadata);
+		this.tag = tag;
+		Assert.check(tag.isCondition);
+	}
+
+	@Override
+	public JCConditionType cloneWithMetadata(TypeMetadata md) {
+		return new JCConditionType(tag, tsym, md) {
+			@Override
+			public Type baseType() { return JCConditionType.this.baseType(); }
+		};
+	}
+
+	@Override
+	public boolean isCondition() {
+		return true;
+	}
+
+	@Override
+	public TypeTag getTag() {
+		return tag;
+	}
+
+	@Override @DefinedBy(Api.LANGUAGE_MODEL)
+	public <R, P> R accept(TypeVisitor<R,P> v, P p) {
+		return v.visitCondition(this, p);
+	}
+
+	@Override @DefinedBy(Api.LANGUAGE_MODEL)
+	public TypeKind getKind() {
+		if( tag == CONDITION ) {
+			return TypeKind.CONDITION;
+		}
+		throw new AssertionError();
+	}
     }
 
     public static class WildcardType extends Type

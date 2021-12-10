@@ -183,10 +183,10 @@ class Token implements java.io.Serializable {
         if (COUNTTOKENS)  Token.tokens ++;
         return new Token.ModifierToken(child, add, mask);
     }
-    static Token.ConditionToken createCondition(int refno, Token condition,
+    static Token.ConditionToken createCondition(int refno, Token conditiona,
                                                 Token yespat, Token nopat) {
         if (COUNTTOKENS)  Token.tokens ++;
-        return new Token.ConditionToken(refno, condition, yespat, nopat);
+        return new Token.ConditionToken(refno, conditiona, yespat, nopat);
     }
 
     protected Token(int type) {
@@ -1349,13 +1349,13 @@ class Token implements java.io.Serializable {
         private static final long serialVersionUID = 4353765277910594411L;
 
         final int refNumber;
-        final Token condition;
+        final Token conditiona;
         final Token yes;
         final Token no;
         ConditionToken(int refno, Token cond, Token yespat, Token nopat) {
             super(Token.CONDITION);
             this.refNumber = refno;
-            this.condition = cond;
+            this.conditiona = cond;
             this.yes = yespat;
             this.no = nopat;
         }
@@ -1372,10 +1372,10 @@ class Token implements java.io.Serializable {
             String ret;
             if (refNumber > 0) {
                 ret = "(?("+refNumber+")";
-            } else if (this.condition.type == Token.ANCHOR) {
-                ret = "(?("+this.condition+")";
+            } else if (this.conditiona.type == Token.ANCHOR) {
+                ret = "(?("+this.conditiona+")";
             } else {
-                ret = "(?"+this.condition;
+                ret = "(?"+this.conditiona;
             }
 
             if (this.no == null) {

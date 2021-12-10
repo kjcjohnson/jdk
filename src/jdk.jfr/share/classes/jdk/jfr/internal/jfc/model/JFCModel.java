@@ -154,9 +154,9 @@ public final class JFCModel {
 
     private void wireConditions() {
         for (XmlControl control : configuration.getControls()) {
-            for (XmlCondition condition : control.getConditions()) {
-                for (XmlElement element : condition.getChildren()) {
-                    wireExpression(condition, element);
+            for (XmlCondition conditiona : control.getConditions()) {
+                for (XmlElement element : conditiona.getChildren()) {
+                    wireExpression(conditiona, element);
                 }
             }
         }

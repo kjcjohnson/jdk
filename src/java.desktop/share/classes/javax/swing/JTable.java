@@ -5317,12 +5317,12 @@ public class JTable extends JComponent implements TableModelListener, Scrollable
 //
 
     protected boolean processKeyBinding(KeyStroke ks, KeyEvent e,
-                                        int condition, boolean pressed) {
-        boolean retValue = super.processKeyBinding(ks, e, condition, pressed);
+                                        int conditiona, boolean pressed) {
+        boolean retValue = super.processKeyBinding(ks, e, conditiona, pressed);
 
         // Start editing when a key is typed. UI classes can disable this behavior
         // by setting the client property JTable.autoStartsEdit to Boolean.FALSE.
-        if (!retValue && condition == WHEN_ANCESTOR_OF_FOCUSED_COMPONENT &&
+        if (!retValue && conditiona == WHEN_ANCESTOR_OF_FOCUSED_COMPONENT &&
             isFocusOwner() &&
             !Boolean.FALSE.equals(getClientProperty("JTable.autoStartsEdit"))) {
             // We do not have a binding for the event.

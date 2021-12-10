@@ -115,6 +115,11 @@ public interface Tree {
          */
         COMPILATION_UNIT(CompilationUnitTree.class),
 
+	/**
+	 * Used for instances of {@link ConditionTypeTree}.
+	 */
+	CONDITION_TYPE(ConditionTypeTree.class),
+
         /**
          * Used for instances of {@link ConditionalExpressionTree}.
          */

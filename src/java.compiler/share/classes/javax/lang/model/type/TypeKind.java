@@ -103,6 +103,11 @@ public enum TypeKind {
     ARRAY,
 
     /**
+     * A condition type.
+     */
+    CONDITION,
+
+    /**
      * A class or interface type.
      */
     DECLARED,

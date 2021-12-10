@@ -241,19 +241,19 @@ public class BasicDesktopPaneUI extends DesktopPaneUI {
     protected void unregisterKeyboardActions(){
     }
 
-    InputMap getInputMap(int condition) {
-        if (condition == JComponent.WHEN_IN_FOCUSED_WINDOW) {
-            return createInputMap(condition);
+    InputMap getInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_IN_FOCUSED_WINDOW) {
+            return createInputMap(conditiona);
         }
-        else if (condition == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
+        else if (conditiona == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
             return (InputMap)DefaultLookup.get(desktop, this,
                     "Desktop.ancestorInputMap");
         }
         return null;
     }
 
-    InputMap createInputMap(int condition) {
-        if (condition == JComponent.WHEN_IN_FOCUSED_WINDOW) {
+    InputMap createInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_IN_FOCUSED_WINDOW) {
             Object[] bindings = (Object[])DefaultLookup.get(desktop,
                     this, "Desktop.windowBindings");
 

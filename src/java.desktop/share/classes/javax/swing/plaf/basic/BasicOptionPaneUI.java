@@ -283,8 +283,8 @@ public class BasicOptionPaneUI extends OptionPaneUI {
         SwingUtilities.replaceUIActionMap(optionPane, null);
     }
 
-    InputMap getInputMap(int condition) {
-        if (condition == JComponent.WHEN_IN_FOCUSED_WINDOW) {
+    InputMap getInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_IN_FOCUSED_WINDOW) {
             Object[] bindings = (Object[])DefaultLookup.get(
                              optionPane, this, "OptionPane.windowBindings");
             if (bindings != null) {
@@ -1513,11 +1513,11 @@ public class BasicOptionPaneUI extends OptionPaneUI {
         }
 
         protected boolean processKeyBinding(KeyStroke ks, KeyEvent e,
-                                            int condition, boolean pressed) {
-            boolean processed = super.processKeyBinding(ks, e, condition,
+                                            int conditiona, boolean pressed) {
+            boolean processed = super.processKeyBinding(ks, e, conditiona,
                                                         pressed);
 
-            if (processed && condition != JComponent.WHEN_IN_FOCUSED_WINDOW) {
+            if (processed && conditiona != JComponent.WHEN_IN_FOCUSED_WINDOW) {
                 for (int counter = strokes.length - 1; counter >= 0;
                          counter--) {
                     if (strokes[counter].equals(ks)) {

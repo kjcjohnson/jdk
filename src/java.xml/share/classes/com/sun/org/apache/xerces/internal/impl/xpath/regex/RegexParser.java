@@ -468,7 +468,7 @@ class RegexParser {
         if (this.offset+1 >= this.regexlen)  throw ex("parser.factor.4", this.offset);
                                                 // Parses a condition.
         int refno = -1;
-        Token condition = null;
+        Token conditiona = null;
         int ch = this.regex.charAt(this.offset);
         if ('1' <= ch && ch <= '9') {
             refno = ch-'0';
@@ -503,8 +503,8 @@ class RegexParser {
         } else {
             if (ch == '?')  this.offset --; // Points '('.
             this.next();
-            condition = this.parseFactor();
-            switch (condition.type) {
+            conditiona = this.parseFactor();
+            switch (conditiona.type) {
               case Token.LOOKAHEAD:
               case Token.NEGATIVELOOKAHEAD:
               case Token.LOOKBEHIND:
@@ -528,7 +528,7 @@ class RegexParser {
         }
         if (this.read() != T_RPAREN)  throw ex("parser.factor.1", this.offset-1);
         this.next();
-        return Token.createCondition(refno, condition, yesPattern, noPattern);
+        return Token.createCondition(refno, conditiona, yesPattern, noPattern);
     }
     Token processModifiers() throws ParseException {
                                                 // this.offset points the next of '?'.

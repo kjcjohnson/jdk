@@ -424,8 +424,8 @@ public class BasicMenuItemUI extends MenuItemUI
         return handler;
     }
 
-    InputMap createInputMap(int condition) {
-        if (condition == JComponent.WHEN_IN_FOCUSED_WINDOW) {
+    InputMap createInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_IN_FOCUSED_WINDOW) {
             return new ComponentInputMapUIResource(menuItem);
         }
         return null;

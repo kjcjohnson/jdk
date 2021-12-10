@@ -410,8 +410,8 @@ public class BasicSliderUI extends SliderUI{
                 "Slider.actionMap");
     }
 
-    InputMap getInputMap(int condition, JSlider slider) {
-        if (condition == JComponent.WHEN_FOCUSED) {
+    InputMap getInputMap(int conditiona, JSlider slider) {
+        if (conditiona == JComponent.WHEN_FOCUSED) {
             InputMap keyMap = (InputMap)DefaultLookup.get(slider, this,
                   "Slider.focusInputMap");
             InputMap rtlKeyMap;

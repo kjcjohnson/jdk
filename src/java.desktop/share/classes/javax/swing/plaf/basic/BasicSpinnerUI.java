@@ -589,8 +589,8 @@ public class BasicSpinnerUI extends SpinnerUI
     /**
      * Returns the InputMap to install for <code>condition</code>.
      */
-    private InputMap getInputMap(int condition) {
-        if (condition == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
+    private InputMap getInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
             return (InputMap)DefaultLookup.get(spinner, this,
                     "Spinner.ancestorInputMap");
         }

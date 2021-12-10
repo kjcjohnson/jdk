@@ -912,6 +912,14 @@ public class TreeScanner<R,P> implements TreeVisitor<R,P> {
     }
 
     /**
+     * [TODO] copy comment from visitPrimitiveType
+     */
+    @Override
+    public R visitConditionType(ConditionTypeTree node, P p) {
+	return null;
+    }
+
+    /**
      * {@inheritDoc}
      *
      * @implSpec This implementation scans the children in left to right order.

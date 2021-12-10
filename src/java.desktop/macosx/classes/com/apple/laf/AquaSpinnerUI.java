@@ -359,8 +359,8 @@ public class AquaSpinnerUI extends SpinnerUI {
         SwingUtilities.replaceUIActionMap(spinner, getActionMap());
     }
 
-    private InputMap getInputMap(final int condition) {
-        if (condition == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
+    private InputMap getInputMap(final int conditiona) {
+        if (conditiona == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
             return (InputMap) UIManager.get("Spinner.ancestorInputMap");
         }
         return null;

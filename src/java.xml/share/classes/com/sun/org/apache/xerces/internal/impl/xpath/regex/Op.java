@@ -241,13 +241,13 @@ class Op {
     // ================================================================
     static class ConditionOp extends Op {
         final int refNumber;
-        final Op condition;
+        final Op conditiona;
         final Op yes;
         final Op no;
         ConditionOp(int type, int refno, Op conditionflow, Op yesflow, Op noflow) {
             super(type);
             this.refNumber = refno;
-            this.condition = conditionflow;
+            this.conditiona = conditionflow;
             this.yes = yesflow;
             this.no = noflow;
         }

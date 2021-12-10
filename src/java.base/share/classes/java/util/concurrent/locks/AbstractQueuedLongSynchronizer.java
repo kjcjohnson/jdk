@@ -972,12 +972,12 @@ public abstract class AbstractQueuedLongSynchronizer
      * Queries whether the given ConditionObject
      * uses this synchronizer as its lock.
      *
-     * @param condition the condition
+     * @param conditiona the condition
      * @return {@code true} if owned
      * @throws NullPointerException if the condition is null
      */
-    public final boolean owns(ConditionObject condition) {
-        return condition.isOwnedBy(this);
+    public final boolean owns(ConditionObject conditiona) {
+        return conditiona.isOwnedBy(this);
     }
 
     /**
@@ -988,7 +988,7 @@ public abstract class AbstractQueuedLongSynchronizer
      * any threads.  This method is designed primarily for use in
      * monitoring of the system state.
      *
-     * @param condition the condition
+     * @param conditiona the condition
      * @return {@code true} if there are any waiting threads
      * @throws IllegalMonitorStateException if exclusive synchronization
      *         is not held
@@ -996,10 +996,10 @@ public abstract class AbstractQueuedLongSynchronizer
      *         not associated with this synchronizer
      * @throws NullPointerException if the condition is null
      */
-    public final boolean hasWaiters(ConditionObject condition) {
-        if (!owns(condition))
+    public final boolean hasWaiters(ConditionObject conditiona) {
+        if (!owns(conditiona))
             throw new IllegalArgumentException("Not owner");
-        return condition.hasWaiters();
+        return conditiona.hasWaiters();
     }
 
     /**
@@ -1010,7 +1010,7 @@ public abstract class AbstractQueuedLongSynchronizer
      * waiters.  This method is designed for use in monitoring system
      * state, not for synchronization control.
      *
-     * @param condition the condition
+     * @param conditiona the condition
      * @return the estimated number of waiting threads
      * @throws IllegalMonitorStateException if exclusive synchronization
      *         is not held
@@ -1018,10 +1018,10 @@ public abstract class AbstractQueuedLongSynchronizer
      *         not associated with this synchronizer
      * @throws NullPointerException if the condition is null
      */
-    public final int getWaitQueueLength(ConditionObject condition) {
-        if (!owns(condition))
+    public final int getWaitQueueLength(ConditionObject conditiona) {
+        if (!owns(conditiona))
             throw new IllegalArgumentException("Not owner");
-        return condition.getWaitQueueLength();
+        return conditiona.getWaitQueueLength();
     }
 
     /**
@@ -1032,7 +1032,7 @@ public abstract class AbstractQueuedLongSynchronizer
      * collection is only a best-effort estimate. The elements of the
      * returned collection are in no particular order.
      *
-     * @param condition the condition
+     * @param conditiona the condition
      * @return the collection of threads
      * @throws IllegalMonitorStateException if exclusive synchronization
      *         is not held
@@ -1040,10 +1040,10 @@ public abstract class AbstractQueuedLongSynchronizer
      *         not associated with this synchronizer
      * @throws NullPointerException if the condition is null
      */
-    public final Collection<Thread> getWaitingThreads(ConditionObject condition) {
-        if (!owns(condition))
+    public final Collection<Thread> getWaitingThreads(ConditionObject conditiona) {
+        if (!owns(conditiona))
             throw new IllegalArgumentException("Not owner");
-        return condition.getWaitingThreads();
+        return conditiona.getWaitingThreads();
     }
 
     /**

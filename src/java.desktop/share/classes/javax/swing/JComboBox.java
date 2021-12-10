@@ -1457,12 +1457,12 @@ implements ItemSelectable,ListDataListener,ActionListener, Accessible {
      * {@inheritDoc}
      */
     @Override
-    protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
-        if (super.processKeyBinding(ks, e, condition, pressed)) {
+    protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int conditiona, boolean pressed) {
+        if (super.processKeyBinding(ks, e, conditiona, pressed)) {
             return true;
         }
 
-        if (!isEditable() || condition != WHEN_FOCUSED || getEditor() == null
+        if (!isEditable() || conditiona != WHEN_FOCUSED || getEditor() == null
                 || !Boolean.TRUE.equals(getClientProperty("JComboBox.isTableCellEditor"))) {
             return false;
         }

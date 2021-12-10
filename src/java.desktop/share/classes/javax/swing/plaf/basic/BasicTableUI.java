@@ -1537,8 +1537,8 @@ public class BasicTableUI extends TableUI
                                 inputMap);
     }
 
-    InputMap getInputMap(int condition) {
-        if (condition == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
+    InputMap getInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
             InputMap keyMap =
                 (InputMap)DefaultLookup.get(table, this,
                                             "Table.ancestorInputMap");

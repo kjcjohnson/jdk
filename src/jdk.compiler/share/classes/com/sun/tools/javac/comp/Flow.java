@@ -1936,7 +1936,8 @@ public class Flow {
             if ((sym.adr >= firstadr || sym.owner.kind != TYP) &&
                 trackable(sym) &&
                 !inits.isMember(sym.adr) &&
-                (sym.flags_field & CLASH) == 0) {
+                (sym.flags_field & CLASH) == 0 &&
+		!sym.type.isCondition() ) {
                     log.error(pos, errkey);
                 inits.incl(sym.adr);
             }

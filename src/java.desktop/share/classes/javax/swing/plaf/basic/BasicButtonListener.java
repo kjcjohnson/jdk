@@ -126,8 +126,8 @@ public class BasicButtonListener implements MouseListener, MouseMotionListener,
      * Returns the InputMap for condition <code>condition</code>. Called as
      * part of <code>installKeyboardActions</code>.
      */
-    InputMap getInputMap(int condition, JComponent c) {
-        if (condition == JComponent.WHEN_FOCUSED) {
+    InputMap getInputMap(int conditiona, JComponent c) {
+        if (conditiona == JComponent.WHEN_FOCUSED) {
             BasicButtonUI ui = (BasicButtonUI)BasicLookAndFeel.getUIOfType(
                          ((AbstractButton)c).getUI(), BasicButtonUI.class);
             if (ui != null) {

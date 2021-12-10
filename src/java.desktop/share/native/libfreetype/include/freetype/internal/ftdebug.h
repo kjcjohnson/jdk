@@ -222,10 +222,10 @@ FT_BEGIN_HEADER
 
 #ifdef FT_DEBUG_LEVEL_ERROR
 
-#define FT_ASSERT( condition )                                      \
+#define FT_ASSERT( conditiona )                                     \
           do                                                        \
           {                                                         \
-            if ( !( condition ) )                                   \
+            if ( !( conditiona ) )                                  \
               FT_Panic( "assertion failed on line %d of file %s\n", \
                         __LINE__, __FILE__ );                       \
           } while ( 0 )
@@ -238,7 +238,7 @@ FT_BEGIN_HEADER
 
 #else /* !FT_DEBUG_LEVEL_ERROR */
 
-#define FT_ASSERT( condition )  do { } while ( 0 )
+#define FT_ASSERT( conditiona )  do { } while ( 0 )
 
 #define FT_THROW( e )  FT_ERR_CAT( FT_ERR_PREFIX, e )
 

@@ -1418,19 +1418,19 @@ public class ReentrantReadWriteLock
      * threads.  This method is designed primarily for use in
      * monitoring of the system state.
      *
-     * @param condition the condition
+     * @param conditiona the condition
      * @return {@code true} if there are any waiting threads
      * @throws IllegalMonitorStateException if this lock is not held
      * @throws IllegalArgumentException if the given condition is
      *         not associated with this lock
      * @throws NullPointerException if the condition is null
      */
-    public boolean hasWaiters(Condition condition) {
-        if (condition == null)
+    public boolean hasWaiters(Condition conditiona) {
+        if (conditiona == null)
             throw new NullPointerException();
-        if (!(condition instanceof AbstractQueuedSynchronizer.ConditionObject))
+        if (!(conditiona instanceof AbstractQueuedSynchronizer.ConditionObject))
             throw new IllegalArgumentException("not owner");
-        return sync.hasWaiters((AbstractQueuedSynchronizer.ConditionObject)condition);
+        return sync.hasWaiters((AbstractQueuedSynchronizer.ConditionObject)conditiona);
     }
 
     /**
@@ -1441,19 +1441,19 @@ public class ReentrantReadWriteLock
      * This method is designed for use in monitoring of the system
      * state, not for synchronization control.
      *
-     * @param condition the condition
+     * @param conditiona the condition
      * @return the estimated number of waiting threads
      * @throws IllegalMonitorStateException if this lock is not held
      * @throws IllegalArgumentException if the given condition is
      *         not associated with this lock
      * @throws NullPointerException if the condition is null
      */
-    public int getWaitQueueLength(Condition condition) {
-        if (condition == null)
+    public int getWaitQueueLength(Condition conditiona) {
+        if (conditiona == null)
             throw new NullPointerException();
-        if (!(condition instanceof AbstractQueuedSynchronizer.ConditionObject))
+        if (!(conditiona instanceof AbstractQueuedSynchronizer.ConditionObject))
             throw new IllegalArgumentException("not owner");
-        return sync.getWaitQueueLength((AbstractQueuedSynchronizer.ConditionObject)condition);
+        return sync.getWaitQueueLength((AbstractQueuedSynchronizer.ConditionObject)conditiona);
     }
 
     /**
@@ -1466,19 +1466,19 @@ public class ReentrantReadWriteLock
      * facilitate construction of subclasses that provide more
      * extensive condition monitoring facilities.
      *
-     * @param condition the condition
+     * @param conditiona the condition
      * @return the collection of threads
      * @throws IllegalMonitorStateException if this lock is not held
      * @throws IllegalArgumentException if the given condition is
      *         not associated with this lock
      * @throws NullPointerException if the condition is null
      */
-    protected Collection<Thread> getWaitingThreads(Condition condition) {
-        if (condition == null)
+    protected Collection<Thread> getWaitingThreads(Condition conditiona) {
+        if (conditiona == null)
             throw new NullPointerException();
-        if (!(condition instanceof AbstractQueuedSynchronizer.ConditionObject))
+        if (!(conditiona instanceof AbstractQueuedSynchronizer.ConditionObject))
             throw new IllegalArgumentException("not owner");
-        return sync.getWaitingThreads((AbstractQueuedSynchronizer.ConditionObject)condition);
+        return sync.getWaitingThreads((AbstractQueuedSynchronizer.ConditionObject)conditiona);
     }
 
     /**

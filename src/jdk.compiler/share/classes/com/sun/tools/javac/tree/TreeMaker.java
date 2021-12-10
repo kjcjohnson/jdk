@@ -543,6 +543,12 @@ public class TreeMaker implements JCTree.Factory {
         return tree;
     }
 
+    public JCConditionTypeTree TypeCondition() {
+	JCConditionTypeTree tree = new JCConditionTypeTree();
+	tree.pos = pos;
+	return tree;
+    }
+
     public JCArrayTypeTree TypeArray(JCExpression elemtype) {
         JCArrayTypeTree tree = new JCArrayTypeTree(elemtype);
         tree.pos = pos;

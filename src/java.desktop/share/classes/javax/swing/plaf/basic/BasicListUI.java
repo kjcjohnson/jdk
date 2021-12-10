@@ -726,8 +726,8 @@ public class BasicListUI extends ListUI
                                            "List.actionMap");
     }
 
-    InputMap getInputMap(int condition) {
-        if (condition == JComponent.WHEN_FOCUSED) {
+    InputMap getInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_FOCUSED) {
             InputMap keyMap = (InputMap)DefaultLookup.get(
                              list, this, "List.focusInputMap");
             InputMap rtlKeyMap;

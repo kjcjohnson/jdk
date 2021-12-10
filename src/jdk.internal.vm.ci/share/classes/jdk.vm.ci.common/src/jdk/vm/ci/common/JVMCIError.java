@@ -58,13 +58,13 @@ public class JVMCIError extends Error {
      * violations should clearly indicate the nature of the problem as well as a suggested solution
      * if possible.
      *
-     * @param condition the condition to check
+     * @param conditiona the condition to check
      * @param msg the message that will be associated with the error, in
      *            {@link String#format(String, Object...)} syntax
      * @param args arguments to the format string
      */
-    public static void guarantee(boolean condition, String msg, Object... args) {
-        if (!condition) {
+    public static void guarantee(boolean conditiona, String msg, Object... args) {
+        if (!conditiona) {
             throw new JVMCIError("failed guarantee: " + msg, args);
         }
     }

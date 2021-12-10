@@ -1039,10 +1039,10 @@ public class ResponseSubscribers {
             return body;
         }
 
-        private boolean suppress(boolean condition,
+        private boolean suppress(boolean conditiona,
                                  String assertion,
                                  Throwable carrier) {
-            if (!condition) {
+            if (!conditiona) {
                 if (carrier != null) {
                     carrier.addSuppressed(new AssertionError(assertion));
                 } else if (Log.errors()) {

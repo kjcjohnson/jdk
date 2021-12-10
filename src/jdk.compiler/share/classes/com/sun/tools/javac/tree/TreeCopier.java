@@ -461,6 +461,12 @@ public class TreeCopier<P> implements TreeVisitor<JCTree,P> {
     }
 
     @DefinedBy(Api.COMPILER_TREE)
+    public JCTree visitConditionType(ConditionTypeTree node, P p) {
+	JCConditionTypeTree t = (JCConditionTypeTree) node;
+        return M.at(t.pos).TypeCondition();
+    }
+
+    @DefinedBy(Api.COMPILER_TREE)
     public JCTree visitTypeCast(TypeCastTree node, P p) {
         JCTypeCast t = (JCTypeCast) node;
         JCTree clazz = copy(t.clazz, p);

@@ -1485,7 +1485,7 @@ typedef void (APIENTRYP PFNGLDRAWRANGEELEMENTSBASEVERTEXPROC) (GLenum mode, GLui
 typedef void (APIENTRYP PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC) (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount, GLint basevertex);
 typedef void (APIENTRYP PFNGLMULTIDRAWELEMENTSBASEVERTEXPROC) (GLenum mode, const GLsizei *count, GLenum type, const void *const*indices, GLsizei drawcount, const GLint *basevertex);
 typedef void (APIENTRYP PFNGLPROVOKINGVERTEXPROC) (GLenum mode);
-typedef GLsync (APIENTRYP PFNGLFENCESYNCPROC) (GLenum condition, GLbitfield flags);
+typedef GLsync (APIENTRYP PFNGLFENCESYNCPROC) (GLenum conditiona, GLbitfield flags);
 typedef GLboolean (APIENTRYP PFNGLISSYNCPROC) (GLsync sync);
 typedef void (APIENTRYP PFNGLDELETESYNCPROC) (GLsync sync);
 typedef GLenum (APIENTRYP PFNGLCLIENTWAITSYNCPROC) (GLsync sync, GLbitfield flags, GLuint64 timeout);
@@ -1505,7 +1505,7 @@ GLAPI void APIENTRY glDrawRangeElementsBaseVertex (GLenum mode, GLuint start, GL
 GLAPI void APIENTRY glDrawElementsInstancedBaseVertex (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount, GLint basevertex);
 GLAPI void APIENTRY glMultiDrawElementsBaseVertex (GLenum mode, const GLsizei *count, GLenum type, const void *const*indices, GLsizei drawcount, const GLint *basevertex);
 GLAPI void APIENTRY glProvokingVertex (GLenum mode);
-GLAPI GLsync APIENTRY glFenceSync (GLenum condition, GLbitfield flags);
+GLAPI GLsync APIENTRY glFenceSync (GLenum conditiona, GLbitfield flags);
 GLAPI GLboolean APIENTRY glIsSync (GLsync sync);
 GLAPI void APIENTRY glDeleteSync (GLsync sync);
 GLAPI GLenum APIENTRY glClientWaitSync (GLsync sync, GLbitfield flags, GLuint64 timeout);
@@ -9905,7 +9905,7 @@ typedef GLboolean (APIENTRYP PFNGLISFENCENVPROC) (GLuint fence);
 typedef GLboolean (APIENTRYP PFNGLTESTFENCENVPROC) (GLuint fence);
 typedef void (APIENTRYP PFNGLGETFENCEIVNVPROC) (GLuint fence, GLenum pname, GLint *params);
 typedef void (APIENTRYP PFNGLFINISHFENCENVPROC) (GLuint fence);
-typedef void (APIENTRYP PFNGLSETFENCENVPROC) (GLuint fence, GLenum condition);
+typedef void (APIENTRYP PFNGLSETFENCENVPROC) (GLuint fence, GLenum conditiona);
 #ifdef GL_GLEXT_PROTOTYPES
 GLAPI void APIENTRY glDeleteFencesNV (GLsizei n, const GLuint *fences);
 GLAPI void APIENTRY glGenFencesNV (GLsizei n, GLuint *fences);
@@ -9913,7 +9913,7 @@ GLAPI GLboolean APIENTRY glIsFenceNV (GLuint fence);
 GLAPI GLboolean APIENTRY glTestFenceNV (GLuint fence);
 GLAPI void APIENTRY glGetFenceivNV (GLuint fence, GLenum pname, GLint *params);
 GLAPI void APIENTRY glFinishFenceNV (GLuint fence);
-GLAPI void APIENTRY glSetFenceNV (GLuint fence, GLenum condition);
+GLAPI void APIENTRY glSetFenceNV (GLuint fence, GLenum conditiona);
 #endif
 #endif /* GL_NV_fence */
 

@@ -646,10 +646,10 @@ public class RegularExpression implements java.io.Serializable {
         case Token.CONDITION:
             Token.ConditionToken ctok = (Token.ConditionToken)tok;
             int ref = ctok.refNumber;
-            Op condition = ctok.condition == null ? null : compile(ctok.condition, null, reverse);
+            Op conditiona = ctok.conditiona == null ? null : compile(ctok.conditiona, null, reverse);
             Op yes = compile(ctok.yes, next, reverse);
             Op no = ctok.no == null ? null : compile(ctok.no, next, reverse);
-            ret = Op.createCondition(next, ref, condition, yes, no);
+            ret = Op.createCondition(next, ref, conditiona, yes, no);
             break;
 
         default:
@@ -1306,7 +1306,7 @@ public class RegularExpression implements java.io.Serializable {
                         else {
                             opStack.push(op);
                             dataStack.push(offset);
-                            op = cop.condition;
+                            op = cop.conditiona;
                         }
                     }
                     break;

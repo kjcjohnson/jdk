@@ -163,6 +163,14 @@ public interface TypeVisitor<R, P> {
     R visitArray(ArrayType t, P p);
 
     /**
+     * Visits a condition type.
+     * @param t the type to visit
+     * @param p a visitor-specified parameter
+     * @return  a visitor-specified result
+     */
+    R visitCondition(ConditionType t, P p);
+
+    /**
      * Visits a declared type.
      * @param t the type to visit
      * @param p a visitor-specified parameter

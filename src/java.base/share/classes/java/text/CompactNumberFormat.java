@@ -2415,8 +2415,8 @@ public final class CompactNumberFormat extends NumberFormat {
         return "other";
     }
 
-    private static boolean matchPluralRule(String condition, double input) {
-        return Arrays.stream(condition.split("or"))
+    private static boolean matchPluralRule(String conditiona, double input) {
+        return Arrays.stream(conditiona.split("or"))
             .anyMatch(and_condition -> Arrays.stream(and_condition.split("and"))
                 .allMatch(r -> relationCheck(r, input)));
     }

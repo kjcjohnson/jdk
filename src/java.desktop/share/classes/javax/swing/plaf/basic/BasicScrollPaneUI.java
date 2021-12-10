@@ -218,8 +218,8 @@ public class BasicScrollPaneUI
                                            "ScrollPane.actionMap");
     }
 
-    InputMap getInputMap(int condition) {
-        if (condition == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
+    InputMap getInputMap(int conditiona) {
+        if (conditiona == JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
             InputMap keyMap = (InputMap)DefaultLookup.get(scrollpane, this,
                                         "ScrollPane.ancestorInputMap");
             InputMap rtlKeyMap;
