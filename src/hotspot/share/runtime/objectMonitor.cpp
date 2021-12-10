@@ -283,9 +283,11 @@ ObjectMonitor::ObjectMonitor(oop object) :
   _Spinner(0),
   _SpinDuration(ObjectMonitor::Knob_SpinLimit),
   _contentions(0),
+  _objectID(object),
   _WaitSet(NULL),
   _waiters(0),
   _WaitSetLock(0)
+
 { }
 
 ObjectMonitor::~ObjectMonitor() {
@@ -749,7 +751,7 @@ void ObjectMonitor::EnterI(JavaThread* current) {
   // as well as eliminate a subset of ABA issues.
   // TODO: eliminate ObjectWaiter and enqueue either Threads or Events.
 
-  ObjectWaiter node(current);
+  ObjectWaiter node(current, _objectID);
   current->_ParkEvent->reset();
   node._prev   = (ObjectWaiter*) 0xBAD;
   node.TState  = ObjectWaiter::TS_CXQ;
@@ -1452,7 +1454,10 @@ static void post_monitor_wait_event(EventJavaMonitorWait* event,
 //
 // Note: a subset of changes to ObjectMonitor::wait()
 // will need to be replicated in complete_exit
-void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS) {
+void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS, oop object) {
+  if (object == NULL)
+    object = _objectID;
+
   JavaThread* current = THREAD;
 
   assert(InitDone, "Unexpectedly not initialized");
@@ -1491,7 +1496,7 @@ void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS) {
   // create a node to be put into the queue
   // Critically, after we reset() the event but prior to park(), we must check
   // for a pending interrupt.
-  ObjectWaiter node(current);
+  ObjectWaiter node(current, object);
   node.TState = ObjectWaiter::TS_WAIT;
   current->_ParkEvent->reset();
   OrderAccess::fence();          // ST into Event; membar ; LD interrupted-flag
@@ -1504,7 +1509,7 @@ void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS) {
   // so we use a simple spin-lock instead of a heavier-weight blocking lock.
 
   Thread::SpinAcquire(&_WaitSetLock, "WaitSet - add");
-  AddWaiter(&node);
+  AddWaiter(&node, object);
   Thread::SpinRelease(&_WaitSetLock);
 
   _Responsible = NULL;
@@ -1672,9 +1677,9 @@ void ObjectMonitor::wait(jlong millis, bool interruptible, TRAPS) {
 // then instead of transferring a thread from the WaitSet to the EntryList
 // we might just dequeue a thread from the WaitSet and directly unpark() it.
 
-void ObjectMonitor::INotify(JavaThread* current) {
+void ObjectMonitor::INotify(JavaThread* current, oop object) {
   Thread::SpinAcquire(&_WaitSetLock, "WaitSet - notify");
-  ObjectWaiter* iterator = DequeueWaiter();
+  ObjectWaiter* iterator = DequeueWaiter(object);
   if (iterator != NULL) {
     guarantee(iterator->TState == ObjectWaiter::TS_WAIT, "invariant");
     guarantee(iterator->_notified == 0, "invariant");
@@ -1734,14 +1739,14 @@ void ObjectMonitor::INotify(JavaThread* current) {
 // and the program does not hang whereas it did absent "minimum wait",
 // that suggests a lost wakeup bug.
 
-void ObjectMonitor::notify(TRAPS) {
+void ObjectMonitor::notify(TRAPS, oop object) {
   JavaThread* current = THREAD;
   CHECK_OWNER();  // Throws IMSE if not owner.
   if (_WaitSet == NULL) {
     return;
   }
   DTRACE_MONITOR_PROBE(notify, this, object(), current);
-  INotify(current);
+  INotify(current, object);
   OM_PERFDATA_OP(Notifications, inc(1));
 }
 
@@ -1753,7 +1758,7 @@ void ObjectMonitor::notify(TRAPS) {
 // waitset is "ABCD" and the EntryList is "XYZ". After a notifyAll() in prepend
 // mode the waitset will be empty and the EntryList will be "DCBAXYZ".
 
-void ObjectMonitor::notifyAll(TRAPS) {
+void ObjectMonitor::notifyAll(TRAPS, oop object) {
   JavaThread* current = THREAD;
   CHECK_OWNER();  // Throws IMSE if not owner.
   if (_WaitSet == NULL) {
@@ -1762,9 +1767,9 @@ void ObjectMonitor::notifyAll(TRAPS) {
 
   DTRACE_MONITOR_PROBE(notifyAll, this, object(), current);
   int tally = 0;
-  while (_WaitSet != NULL) {
+  while (first_waiter(object) != NULL) {
     tally++;
-    INotify(current);
+    INotify(current, object);
   }
 
   OM_PERFDATA_OP(Notifications, inc(tally));
@@ -2065,9 +2070,12 @@ int ObjectMonitor::NotRunnable(JavaThread* current, JavaThread* ox) {
 // -----------------------------------------------------------------------------
 // WaitSet management ...
 
-ObjectWaiter::ObjectWaiter(JavaThread* current) {
+ObjectWaiter::ObjectWaiter(JavaThread* current, oop object) {
   _next     = NULL;
   _prev     = NULL;
+  _nextWaitset = NULL;
+  _prevWaitset = NULL;
+  _object = object;
   _notified = 0;
   _notifier_tid = 0;
   TState    = TS_RUN;
@@ -2085,7 +2093,11 @@ void ObjectWaiter::wait_reenter_end(ObjectMonitor * const mon) {
   JavaThreadBlockedOnMonitorEnterState::wait_reenter_end(_thread, _active);
 }
 
-inline void ObjectMonitor::AddWaiter(ObjectWaiter* node) {
+inline void ObjectMonitor::AddWaiter(ObjectWaiter* node, oop object) {
+
+  if (object == NULL)
+    object = _objectID;
+    
   assert(node != NULL, "should not add NULL node");
   assert(node->_prev == NULL, "node already in list");
   assert(node->_next == NULL, "node already in list");
@@ -2095,23 +2107,47 @@ inline void ObjectMonitor::AddWaiter(ObjectWaiter* node) {
     node->_prev = node;
     node->_next = node;
   } else {
-    ObjectWaiter* head = _WaitSet;
-    ObjectWaiter* tail = head->_prev;
-    assert(tail->_next == head, "invariant check");
-    tail->_next = node;
-    head->_prev = node;
-    node->_next = head;
-    node->_prev = tail;
+  	  ObjectWaiter* temp = _WaitSet;
+			while (temp != NULL) {
+				if (object->compare(object, temp->_object) == 0) {
+					ObjectWaiter* head = temp;
+					ObjectWaiter* tail = head->_prev;
+					assert(tail->_next == head, "invariant check");
+					tail->_next = node;
+					head->_prev = node;
+					node->_next = head;
+					node->_prev = tail;
+					return;
+				}
+		  	temp = temp->_nextWaitset;
+			}
+			node->_prev = node;
+			node->_next = node;
+			node->_nextWaitset = _WaitSet;
+			_WaitSet->_prevWaitset = node;
+			_WaitSet = node;
   }
+  return;
 }
 
-inline ObjectWaiter* ObjectMonitor::DequeueWaiter() {
+inline ObjectWaiter* ObjectMonitor::DequeueWaiter(oop object) {
+	if (object == NULL)
+	  object = _objectID;
+	  
   // dequeue the very first waiter
-  ObjectWaiter* waiter = _WaitSet;
-  if (waiter) {
-    DequeueSpecificWaiter(waiter);
+  ObjectWaiter* temp = _WaitSet;
+  while (temp != NULL) {
+    if (object->compare(object, temp->_object) == 0) {
+      ObjectWaiter* waiter = temp;
+      if (waiter) {
+        DequeueSpecificWaiter(waiter);
+      }
+      return waiter;
+    }
+    temp = temp->_nextWaitset;
   }
-  return waiter;
+
+  return NULL;
 }
 
 inline void ObjectMonitor::DequeueSpecificWaiter(ObjectWaiter* node) {
@@ -2124,19 +2160,25 @@ inline void ObjectMonitor::DequeueSpecificWaiter(ObjectWaiter* node) {
   ObjectWaiter* next = node->_next;
   if (next == node) {
     assert(node->_prev == node, "invariant check");
-    _WaitSet = NULL;
   } else {
     ObjectWaiter* prev = node->_prev;
     assert(prev->_next == node, "invariant check");
     assert(next->_prev == node, "invariant check");
     next->_prev = prev;
     prev->_next = next;
-    if (_WaitSet == node) {
-      _WaitSet = next;
-    }
   }
+  
+  if (node->_nextWaitset != NULL)
+    node->_nextWaitset->_prevWaitset = node->_prevWaitset;
+  if (node->_prevWaitset != NULL)
+    node->_prevWaitset->_nextWaitset = node->_nextWaitset;
+  if (_WaitSet == node)
+    _WaitSet = node->_nextWaitset;
+    
   node->_next = NULL;
   node->_prev = NULL;
+  node->_nextWaitset = NULL;
+  node->_prevWaitset = NULL;
 }
 
 // -----------------------------------------------------------------------------

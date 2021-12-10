@@ -46,6 +46,9 @@ class ObjectWaiter : public StackObj {
   enum TStates { TS_UNDEF, TS_READY, TS_RUN, TS_WAIT, TS_ENTER, TS_CXQ };
   ObjectWaiter* volatile _next;
   ObjectWaiter* volatile _prev;
+  ObjectWaiter* volatile _nextWaitset;
+  ObjectWaiter* volatile _prevWaitset;
+  oop _object;
   JavaThread*   _thread;
   jlong         _notifier_tid;
   ParkEvent *   _event;
@@ -53,7 +56,7 @@ class ObjectWaiter : public StackObj {
   volatile TStates TState;
   bool          _active;           // Contention monitoring is enabled
  public:
-  ObjectWaiter(JavaThread* current);
+  ObjectWaiter(JavaThread* current, oop object = NULL);
 
   void wait_reenter_begin(ObjectMonitor *mon);
   void wait_reenter_end(ObjectMonitor *mon);
@@ -172,6 +175,9 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
                                     // along with other fields to determine if an ObjectMonitor can be
                                     // deflated. It is also used by the async deflation protocol. See
                                     // ObjectMonitor::deflate_monitor().
+                                    
+ oop _objectID;
+ 
  protected:
   ObjectWaiter* volatile _WaitSet;  // LL of threads wait()ing on the monitor
   volatile jint  _waiters;          // number of waiting threads
@@ -288,7 +294,19 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
   intx      recursions() const                                         { return _recursions; }
 
   // JVM/TI GetObjectMonitorUsage() needs this:
-  ObjectWaiter* first_waiter()                                         { return _WaitSet; }
+  ObjectWaiter* first_waiter(oop object = NULL) {
+  	if (object == NULL)
+  	  object = _objectID;
+
+    ObjectWaiter* temp = _WaitSet;
+    while (temp != NULL) {
+      if (object->compare(object, temp->_object) == 0)
+        return temp;
+      temp = temp->_nextWaitset;
+    }
+    
+    return NULL; 
+  }
   ObjectWaiter* next_waiter(ObjectWaiter* o)                           { return o->_next; }
   JavaThread* thread_of_waiter(ObjectWaiter* o)                        { return o->_thread; }
 
@@ -322,9 +340,9 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
  public:
   bool      enter(JavaThread* current);
   void      exit(JavaThread* current, bool not_suspended = true);
-  void      wait(jlong millis, bool interruptible, TRAPS);
-  void      notify(TRAPS);
-  void      notifyAll(TRAPS);
+  void      wait(jlong millis, bool interruptible, TRAPS, oop object = NULL);
+  void      notify(TRAPS, oop object = NULL);
+  void      notifyAll(TRAPS, oop object = NULL);
 
   void      print() const;
 #ifdef ASSERT
@@ -337,9 +355,9 @@ class ObjectMonitor : public CHeapObj<mtInternal> {
   bool      reenter(intx recursions, JavaThread* current);
 
  private:
-  void      AddWaiter(ObjectWaiter* waiter);
-  void      INotify(JavaThread* current);
-  ObjectWaiter* DequeueWaiter();
+  void      AddWaiter(ObjectWaiter* waiter, oop object = NULL);
+  void      INotify(JavaThread* current, oop object = NULL);
+  ObjectWaiter* DequeueWaiter(oop object = NULL);
   void      DequeueSpecificWaiter(ObjectWaiter* waiter);
   void      EnterI(JavaThread* current);
   void      ReenterI(JavaThread* current, ObjectWaiter* current_node);
