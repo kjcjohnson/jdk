@@ -290,15 +290,15 @@ final class WixUiFragmentBuilder extends WixFragmentBuilder {
             var order = 6;
 
             // Based on WixUI_InstallDir.wxs
-            var backFromVerifyReadyDlg = List.of(buildPublish().condition(
+            var backFromVerifyReadyDlg = List.of(buildPublish().conditiona(
                     "NOT Installed").order(order));
-            var uncondinal = List.of(buildPublish().condition("1"));
+            var uncondinal = List.of(buildPublish().conditiona("1"));
             var ifNotIstalled = List.of(
-                    buildPublish().condition("NOT Installed").order(order));
-            var ifLicenseAccepted = List.of(buildPublish().condition(
+                    buildPublish().conditiona("NOT Installed").order(order));
+            var ifLicenseAccepted = List.of(buildPublish().conditiona(
                     "LicenseAccepted = \"1\"").order(order));
 
-            // Empty condition list for the default dialog sequence
+            // Empty conditiona list for the default dialog sequence
             map.putAll(createPair(WixUI_WelcomeDlg, WixUI_LicenseAgreementDlg,
                     List.of()));
             map.putAll(
@@ -377,14 +377,14 @@ final class WixUiFragmentBuilder extends WixFragmentBuilder {
 
     private static final class Publish {
 
-        Publish(String control, String condition, int order) {
+        Publish(String control, String conditiona, int order) {
             this.control = control;
-            this.condition = condition;
+            this.conditiona = conditiona;
             this.order = order;
         }
 
         private final String control;
-        private final String condition;
+        private final String conditiona;
         private final int order;
     }
 
@@ -393,13 +393,13 @@ final class WixUiFragmentBuilder extends WixFragmentBuilder {
         PublishBuilder() {
             order(0);
             next();
-            condition("1");
+            conditiona("1");
         }
 
         PublishBuilder(Publish publish) {
             order(publish.order);
             control(publish.control);
-            condition(publish.condition);
+            conditiona(publish.conditiona);
         }
 
         public PublishBuilder control(String v) {
@@ -415,8 +415,8 @@ final class WixUiFragmentBuilder extends WixFragmentBuilder {
             return control("Back");
         }
 
-        public PublishBuilder condition(String v) {
-            condition = v;
+        public PublishBuilder conditiona(String v) {
+            conditiona = v;
             return this;
         }
 
@@ -426,11 +426,11 @@ final class WixUiFragmentBuilder extends WixFragmentBuilder {
         }
 
         Publish create() {
-            return new Publish(control, condition, order);
+            return new Publish(control, conditiona, order);
         }
 
         private String control;
-        private String condition;
+        private String conditiona;
         private int order;
     }
 
@@ -453,7 +453,7 @@ final class WixUiFragmentBuilder extends WixFragmentBuilder {
         if (publish.order != 0) {
             xml.writeAttribute("Order", String.valueOf(publish.order));
         }
-        xml.writeCharacters(publish.condition);
+        xml.writeCharacters(publish.conditiona);
         xml.writeEndElement();
     }
 

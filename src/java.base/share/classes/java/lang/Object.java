@@ -282,15 +282,78 @@ public class Object {
      * </ul>
      * <p>
      * Only one thread at a time can own an object's monitor.
-     *
+     * @param cv Condition variable to wait on
      * @throws  IllegalMonitorStateException  if the current thread is not
      *               the owner of this object's monitor.
      * @see        java.lang.Object#notifyAll()
      * @see        java.lang.Object#wait()
      */
-    @IntrinsicCandidate
-    public final native void notify();
+    //@IntrinsicCandidate
+    public final native void notify(Object cv);
 
+    
+    /**
+     * Wakes up a single thread that is waiting on this object's
+     * monitor. If any threads are waiting on this object, one of them
+     * is chosen to be awakened. The choice is arbitrary and occurs at
+     * the discretion of the implementation. A thread waits on an object's
+     * monitor by calling one of the {@code wait} methods.
+     * <p>
+     * The awakened thread will not be able to proceed until the current
+     * thread relinquishes the lock on this object. The awakened thread will
+     * compete in the usual manner with any other threads that might be
+     * actively competing to synchronize on this object; for example, the
+     * awakened thread enjoys no reliable privilege or disadvantage in being
+     * the next thread to lock this object.
+     * <p>
+     * This method should only be called by a thread that is the owner
+     * of this object's monitor. A thread becomes the owner of the
+     * object's monitor in one of three ways:
+     * <ul>
+     * <li>By executing a synchronized instance method of that object.
+     * <li>By executing the body of a {@code synchronized} statement
+     *     that synchronizes on the object.
+     * <li>For objects of type {@code Class,} by executing a
+     *     synchronized static method of that class.
+     * </ul>
+     * <p>
+     * Only one thread at a time can own an object's monitor.
+     * 
+     * @throws  IllegalMonitorStateException  if the current thread is not
+     *               the owner of this object's monitor.
+     * @see        java.lang.Object#notifyAll()
+     * @see        java.lang.Object#wait()
+     */
+    public final void notify() {
+	notify(null);
+    }
+
+    
+    /**
+     * Wakes up all threads that are waiting on this object's monitor. A
+     * thread waits on an object's monitor by calling one of the
+     * {@code wait} methods.
+     * <p>
+     * The awakened threads will not be able to proceed until the current
+     * thread relinquishes the lock on this object. The awakened threads
+     * will compete in the usual manner with any other threads that might
+     * be actively competing to synchronize on this object; for example,
+     * the awakened threads enjoy no reliable privilege or disadvantage in
+     * being the next thread to lock this object.
+     * <p>
+     * This method should only be called by a thread that is the owner
+     * of this object's monitor. See the {@code notify} method for a
+     * description of the ways in which a thread can become the owner of
+     * a monitor.
+     * @param cv Condition variable to notify all on
+     * @throws  IllegalMonitorStateException  if the current thread is not
+     *               the owner of this object's monitor.
+     * @see        java.lang.Object#notify()
+     * @see        java.lang.Object#wait()
+     */
+    //@IntrinsicCandidate
+    public final native void notifyAll(Object cv);
+    
     /**
      * Wakes up all threads that are waiting on this object's monitor. A
      * thread waits on an object's monitor by calling one of the
@@ -313,8 +376,10 @@ public class Object {
      * @see        java.lang.Object#notify()
      * @see        java.lang.Object#wait()
      */
-    @IntrinsicCandidate
-    public final native void notifyAll();
+    //@IntrinsicCandidate
+    public final void notifyAll() {
+	notifyAll(null);
+    }
 
     /**
      * Causes the current thread to wait until it is awakened, typically
@@ -338,6 +403,31 @@ public class Object {
         wait(0L);
     }
 
+    
+    /**
+     * Causes the current thread to wait until it is awakened, typically
+     * by being <em>notified</em> or <em>interrupted</em>, or until a
+     * certain amount of real time has elapsed.
+     * <p>
+     * In all respects, this method behaves as if {@code wait(timeoutMillis, 0)}
+     * had been called. See the specification of the {@link #wait(long, int)} method
+     * for details.
+     *
+     * @param  timeoutMillis the maximum time to wait, in milliseconds
+     * @param  cv Condition variable to wait on
+     * @throws IllegalArgumentException if {@code timeoutMillis} is negative
+     * @throws IllegalMonitorStateException if the current thread is not
+     *         the owner of the object's monitor
+     * @throws InterruptedException if any thread interrupted the current thread before or
+     *         while the current thread was waiting. The <em>interrupted status</em> of the
+     *         current thread is cleared when this exception is thrown.
+     * @see    #notify()
+     * @see    #notifyAll()
+     * @see    #wait()
+     * @see    #wait(long, int)
+     */
+    public final native void wait(long timeoutMillis, Object cv) throws InterruptedException;
+    
     /**
      * Causes the current thread to wait until it is awakened, typically
      * by being <em>notified</em> or <em>interrupted</em>, or until a
@@ -359,7 +449,9 @@ public class Object {
      * @see    #wait()
      * @see    #wait(long, int)
      */
-    public final native void wait(long timeoutMillis) throws InterruptedException;
+    public final void wait(long timeoutMillis) throws InterruptedException {
+	wait(timeoutMillis, null);
+    }
 
     /**
      * Causes the current thread to wait until it is awakened, typically

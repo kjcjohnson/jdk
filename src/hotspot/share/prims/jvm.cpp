@@ -602,7 +602,7 @@ JVM_ENTRY(jint, JVM_IHashCode(JNIEnv* env, jobject handle))
 JVM_END
 
 
-JVM_ENTRY(void, JVM_MonitorWait(JNIEnv* env, jobject handle, jlong ms))
+JVM_ENTRY(void, JVM_MonitorWait(JNIEnv* env, jobject handle, jlong ms, jobject cv))
   Handle obj(THREAD, JNIHandles::resolve_non_null(handle));
   JavaThreadInObjectWaitState jtiows(thread, ms != 0);
   if (JvmtiExport::should_post_monitor_wait()) {
@@ -618,13 +618,13 @@ JVM_ENTRY(void, JVM_MonitorWait(JNIEnv* env, jobject handle, jlong ms))
 JVM_END
 
 
-JVM_ENTRY(void, JVM_MonitorNotify(JNIEnv* env, jobject handle))
+JVM_ENTRY(void, JVM_MonitorNotify(JNIEnv* env, jobject handle, jobject cv))
   Handle obj(THREAD, JNIHandles::resolve_non_null(handle));
   ObjectSynchronizer::notify(obj, CHECK);
 JVM_END
 
 
-JVM_ENTRY(void, JVM_MonitorNotifyAll(JNIEnv* env, jobject handle))
+JVM_ENTRY(void, JVM_MonitorNotifyAll(JNIEnv* env, jobject handle, jobject cv))
   Handle obj(THREAD, JNIHandles::resolve_non_null(handle));
   ObjectSynchronizer::notifyall(obj, CHECK);
 JVM_END

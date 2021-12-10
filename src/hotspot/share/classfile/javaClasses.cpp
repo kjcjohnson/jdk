@@ -103,11 +103,11 @@ void java_lang_Object::register_natives(TRAPS) {
   Method::register_native(obj, vmSymbols::hashCode_name(),
                           vmSymbols::void_int_signature(), (address) &JVM_IHashCode, CHECK);
   Method::register_native(obj, vmSymbols::wait_name(),
-                          vmSymbols::long_void_signature(), (address) &JVM_MonitorWait, CHECK);
+                          vmSymbols::long_object_void_signature(), (address) &JVM_MonitorWait, CHECK);
   Method::register_native(obj, vmSymbols::notify_name(),
-                          vmSymbols::void_method_signature(), (address) &JVM_MonitorNotify, CHECK);
+                          vmSymbols::object_void_signature(), (address) &JVM_MonitorNotify, CHECK);
   Method::register_native(obj, vmSymbols::notifyAll_name(),
-                          vmSymbols::void_method_signature(), (address) &JVM_MonitorNotifyAll, CHECK);
+                          vmSymbols::object_void_signature(), (address) &JVM_MonitorNotifyAll, CHECK);
   Method::register_native(obj, vmSymbols::clone_name(),
                           vmSymbols::void_object_signature(), (address) &JVM_Clone, THREAD);
 }

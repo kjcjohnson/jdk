@@ -556,6 +556,7 @@
   template(char_array_void_signature,                 "([C)V")                                                    \
   template(int_int_void_signature,                    "(II)V")                                                    \
   template(long_long_void_signature,                  "(JJ)V")                                                    \
+  template(long_object_void_signature, "(JLjava/lang/Object;)V") \
   template(void_classloader_signature,                "()Ljava/lang/ClassLoader;")                                \
   template(void_object_signature,                     "()Ljava/lang/Object;")                                     \
   template(void_class_signature,                      "()Ljava/lang/Class;")                                      \
