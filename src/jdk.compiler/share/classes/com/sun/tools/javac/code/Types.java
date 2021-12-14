@@ -1119,9 +1119,8 @@ public class Types {
                  case BOT:
                      return
                          s.hasTag(BOT) || s.hasTag(CLASS) ||
-                         s.hasTag(ARRAY) || s.hasTag(TYPEVAR);
+                         s.hasTag(ARRAY) || s.hasTag(TYPEVAR) || s.hasTag(CONDITION);
                  case WILDCARD: //we shouldn't be here - avoids crash (see 7034495)
-		 case CONDITION:
                  case NONE:
                      return false;
                  default:
@@ -1210,6 +1209,19 @@ public class Types {
 
                 return false;
             }
+
+	    @Override
+	    public Boolean visitConditionType(ConditionType t, Type s) {
+		if( s.hasTag(CONDITION) ) {
+			return true;
+		}
+
+		if( s.hasTag(CLASS)) {
+			Name sname = s.tsym.getQualifiedName();
+			return sname == names.java_lang_Object;
+		}
+		return false;
+	    }
 
             @Override
             public Boolean visitUndetVar(UndetVar t, Type s) {
@@ -4902,6 +4914,7 @@ public class Types {
         public R visitClassType(ClassType t, S s)       { return visitType(t, s); }
         public R visitWildcardType(WildcardType t, S s) { return visitType(t, s); }
         public R visitArrayType(ArrayType t, S s)       { return visitType(t, s); }
+	public R visitConditionType(ConditionType t, S s){return visitType(t, s); }
         public R visitMethodType(MethodType t, S s)     { return visitType(t, s); }
         public R visitPackageType(PackageType t, S s)   { return visitType(t, s); }
         public R visitModuleType(ModuleType t, S s)     { return visitType(t, s); }

@@ -658,6 +658,11 @@ public class JNIWriter {
             return defaultAction(t, p);
         }
 
+	@Override
+	public R visitConditionType(Type.ConditionType t, P p) {
+	    return defaultAction(t, p);
+	}
+
         @Override
         public R visitMethodType(Type.MethodType t, P p) {
             return defaultAction(t, p);

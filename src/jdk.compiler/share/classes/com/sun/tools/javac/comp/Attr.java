@@ -4887,7 +4887,8 @@ public class Attr extends JCTree.Visitor {
     }
 
     public void visitTypeCondition(JCConditionTypeTree tree) {
-	result = check(tree, syms.typeOfTag[tree.typetag.ordinal()], KindSelector.TYP, resultInfo);
+	Type type = new ConditionType(tree.typetag, syms.conditionClass);
+	result = check(tree, type, KindSelector.TYP, resultInfo);
     }
 
     public void visitTypeArray(JCArrayTypeTree tree) {
