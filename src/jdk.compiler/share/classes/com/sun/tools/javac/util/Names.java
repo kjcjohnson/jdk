@@ -113,6 +113,7 @@ public class Names {
 
     // names of builtin classes
     public final Name Array;
+    public final Name Condition;
     public final Name Bound;
     public final Name Method;
 
@@ -292,6 +293,7 @@ public class Names {
 
         // names of builtin classes
         Array = fromString("Array");
+	Condition = fromString("Condition736");
         Bound = fromString("Bound");
         Method = fromString("Method");
 

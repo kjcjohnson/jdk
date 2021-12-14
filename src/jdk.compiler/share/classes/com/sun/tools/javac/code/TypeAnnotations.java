@@ -34,6 +34,7 @@ import com.sun.tools.javac.code.Attribute.TypeCompound;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type.ArrayType;
+import com.sun.tools.javac.code.Type.ConditionType;
 import com.sun.tools.javac.code.Type.CapturedType;
 import com.sun.tools.javac.code.Type.ClassType;
 import com.sun.tools.javac.code.Type.ErrorType;
@@ -647,6 +648,12 @@ public class TypeAnnotations {
                                                   t.getMetadata());
                     return ret;
                 }
+
+		@Override
+		public Type visitConditionType(ConditionType t, List<TypeCompound> s) {
+			System.out.println("typeannotations condition problem");
+			return t;
+		}
 
                 @Override
                 public Type visitMethodType(MethodType t, List<TypeCompound> s) {

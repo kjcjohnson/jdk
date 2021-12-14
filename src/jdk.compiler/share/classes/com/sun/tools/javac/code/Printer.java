@@ -190,6 +190,11 @@ public abstract class Printer implements Type.Visitor<String, Locale>, Symbol.Vi
         return res.toString();
     }
 
+    @Override
+    public String visitConditionType(ConditionType t, Locale locale) {
+	return "condition";
+    }
+
     private String printAnnotations(Type t) {
         return printAnnotations(t, false);
     }

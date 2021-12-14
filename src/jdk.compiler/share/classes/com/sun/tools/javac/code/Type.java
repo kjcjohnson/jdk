@@ -820,26 +820,26 @@ public abstract class Type extends AnnoConstruct implements TypeMirror, PoolCons
 
     }
 
-    public static class JCConditionType extends Type
+    public static class ConditionType extends Type
 	implements javax.lang.model.type.ConditionType {
 
 	TypeTag tag;
 
-	public JCConditionType(TypeTag tag, TypeSymbol tsym) {
+	public ConditionType(TypeTag tag, TypeSymbol tsym) {
 		this(tag, tsym, TypeMetadata.EMPTY);
 	}
 
-	private JCConditionType(TypeTag tag, TypeSymbol tsym, TypeMetadata metadata) {
+	private ConditionType(TypeTag tag, TypeSymbol tsym, TypeMetadata metadata) {
 		super(tsym, metadata);
 		this.tag = tag;
 		Assert.check(tag.isCondition);
 	}
 
 	@Override
-	public JCConditionType cloneWithMetadata(TypeMetadata md) {
-		return new JCConditionType(tag, tsym, md) {
+	public ConditionType cloneWithMetadata(TypeMetadata md) {
+		return new ConditionType(tag, tsym, md) {
 			@Override
-			public Type baseType() { return JCConditionType.this.baseType(); }
+			public Type baseType() { return ConditionType.this.baseType(); }
 		};
 	}
 
@@ -853,6 +853,10 @@ public abstract class Type extends AnnoConstruct implements TypeMirror, PoolCons
 		return tag;
 	}
 
+	public <R,S> R accept(Type.Visitor<R, S> v, S s) {
+		return v.visitConditionType(this, s);
+	}
+
 	@Override @DefinedBy(Api.LANGUAGE_MODEL)
 	public <R, P> R accept(TypeVisitor<R,P> v, P p) {
 		return v.visitCondition(this, p);
@@ -864,6 +868,27 @@ public abstract class Type extends AnnoConstruct implements TypeMirror, PoolCons
 			return TypeKind.CONDITION;
 		}
 		throw new AssertionError();
+	}
+
+	@DefinedBy(Api.LANGUAGE_MODEL)
+	public String toString() {
+		return "ConditionType736";
+	}
+
+	@Override @DefinedBy(Api.LANGUAGE_MODEL)
+	public boolean equals(Object obj) {
+		return (obj instanceof ConditionType conditionType)
+			&& (this == conditionType || tag.equals(conditionType.tag));
+	}
+
+	@Override
+	public boolean isReference() {
+		return true;
+	}
+
+	@Override
+	public boolean isNullOrReference() {
+		return true;
 	}
     }
 
@@ -2515,6 +2540,7 @@ public abstract class Type extends AnnoConstruct implements TypeMirror, PoolCons
         R visitClassType(ClassType t, S s);
         R visitWildcardType(WildcardType t, S s);
         R visitArrayType(ArrayType t, S s);
+	R visitConditionType(ConditionType t, S s);
         R visitMethodType(MethodType t, S s);
         R visitPackageType(PackageType t, S s);
         R visitModuleType(ModuleType t, S s);
