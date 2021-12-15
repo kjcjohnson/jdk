@@ -614,19 +614,19 @@ JVM_ENTRY(void, JVM_MonitorWait(JNIEnv* env, jobject handle, jlong ms, jobject c
     // event handler cannot accidentally consume an unpark() meant for
     // the ParkEvent associated with this ObjectMonitor.
   }
-  ObjectSynchronizer::wait(obj, ms, CHECK, JNIHandles::resolve(cv));
+  ObjectSynchronizer::wait(obj, ms, CHECK_CVRES(cv));
 JVM_END
 
 
 JVM_ENTRY(void, JVM_MonitorNotify(JNIEnv* env, jobject handle, jobject cv))
   Handle obj(THREAD, JNIHandles::resolve_non_null(handle));
-  ObjectSynchronizer::notify(obj, CHECK, JNIHandles::resolve(cv));
+  ObjectSynchronizer::notify(obj, CHECK_CVRES(cv));
 JVM_END
 
 
 JVM_ENTRY(void, JVM_MonitorNotifyAll(JNIEnv* env, jobject handle, jobject cv))
   Handle obj(THREAD, JNIHandles::resolve_non_null(handle));
-  ObjectSynchronizer::notifyall(obj, CHECK, JNIHandles::resolve(cv));
+  ObjectSynchronizer::notifyall(obj, CHECK_CVRES(cv));
 JVM_END
 
 

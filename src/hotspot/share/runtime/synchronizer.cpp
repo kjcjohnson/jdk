@@ -690,7 +690,7 @@ void ObjectSynchronizer::notify(Handle obj, TRAPS, oop cv) {
   // The ObjectMonitor* can't be async deflated until ownership is
   // dropped by the calling thread.
   ObjectMonitor* monitor = inflate(current, obj(), inflate_cause_notify);
-  monitor->notify(CHECK, cv);
+  monitor->notify(CHECK_CV(cv));
 }
 
 // NOTE: see comment of notify()
@@ -709,7 +709,7 @@ void ObjectSynchronizer::notifyall(Handle obj, TRAPS, oop cv) {
   // The ObjectMonitor* can't be async deflated until ownership is
   // dropped by the calling thread.
   ObjectMonitor* monitor = inflate(current, obj(), inflate_cause_notify);
-  monitor->notifyAll(CHECK, cv);
+  monitor->notifyAll(CHECK_CV(cv));
 }
 
 // -----------------------------------------------------------------------------

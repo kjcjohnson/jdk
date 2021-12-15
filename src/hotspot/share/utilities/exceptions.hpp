@@ -224,6 +224,8 @@ class Exceptions {
 #define CLEAR_PENDING_EXCEPTION                  (((ThreadShadow*)THREAD)->clear_pending_exception())
 
 #define CHECK                                    THREAD); if (HAS_PENDING_EXCEPTION) return       ; (void)(0
+#define CHECK_CVRES(cv)				 THREAD, JNIHandles::resolve(cv)); if (HAS_PENDING_EXCEPTION) return	  ; (void)(0
+#define CHECK_CV(cv)				 THREAD, cv); if(HAS_PENDING_EXCEPTION) return    ; (void)(0
 #define CHECK_(result)                           THREAD); if (HAS_PENDING_EXCEPTION) return result; (void)(0
 #define CHECK_0                                  CHECK_(0)
 #define CHECK_NH                                 CHECK_(Handle())
