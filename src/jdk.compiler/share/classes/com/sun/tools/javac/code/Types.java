@@ -1181,8 +1181,9 @@ public class Types {
             @Override
             public Boolean visitClassType(ClassType t, Type s) {
 		if( s.isCondition() ) {
-			System.out.println("t: "+ t.tsym.getQualifiedName() + " s: " + s.getTag() + " " + s.tsym.getQualifiedName());
-			return true;
+			if( t.tsym.getQualifiedName() == names.java_lang_Object ) {
+				return true;
+			}
 		}
                 Type sup = asSuper(t, s.tsym);
                 if (sup == null) return false;
@@ -1216,7 +1217,6 @@ public class Types {
 
 	    @Override
 	    public Boolean visitConditionType(ConditionType t, Type s) {
-	 	System.out.println("t: " + t.getTag() + " s: " + s.getTag() + " "+ s.tsym.getQualifiedName());
 		if( s.hasTag(CONDITION) ) {
 			return true;
 		}
