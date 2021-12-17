@@ -1180,6 +1180,10 @@ public class Types {
 
             @Override
             public Boolean visitClassType(ClassType t, Type s) {
+		if( s.isCondition() ) {
+			System.out.println("t: "+ t.tsym.getQualifiedName() + " s: " + s.getTag() + " " + s.tsym.getQualifiedName());
+			return true;
+		}
                 Type sup = asSuper(t, s.tsym);
                 if (sup == null) return false;
                 // If t is an intersection, sup might not be a class type
@@ -1212,6 +1216,7 @@ public class Types {
 
 	    @Override
 	    public Boolean visitConditionType(ConditionType t, Type s) {
+	 	System.out.println("t: " + t.getTag() + " s: " + s.getTag() + " "+ s.tsym.getQualifiedName());
 		if( s.hasTag(CONDITION) ) {
 			return true;
 		}
@@ -1448,6 +1453,14 @@ public class Types {
                 return s.hasTag(ARRAY)
                     && containsTypeEquivalent(t.elemtype, elemtype(s));
             }
+
+	    @Override
+	    public Boolean visitConditionType(ConditionType t, Type s) {
+		if( t == s )
+			return true;
+
+		return s.hasTag(CONDITION);
+	    }
 
             @Override
             public Boolean visitMethodType(MethodType t, Type s) {
